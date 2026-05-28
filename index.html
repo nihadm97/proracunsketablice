@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Laboratorija proračunskih tablica</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+:root{--green:#22c55e;--blue:#2563eb;--dark:#111827;--panel:#0f172a;--cellW:110px;--cellH:42px}
+body{min-height:100vh;background:#111827;color:white;overflow:hidden}.topbar{min-height:66px;background:linear-gradient(90deg,#111827,#1f2937);border-bottom:2px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px;position:relative;z-index:30}.logo{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:.3px;font-size:22px;white-space:nowrap}.logo-badge{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.96);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px rgba(0,0,0,.3);overflow:hidden;padding:4px}.logo-img{width:100%;height:100%;object-fit:contain}.top-info{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}.pill,.level-select{background:rgba(255,255,255,.09);color:white;border:1px solid rgba(255,255,255,.12);padding:9px 13px;border-radius:999px;font-weight:800;font-size:14px}.level-select{cursor:pointer;outline:none;max-width:360px}.level-select option{color:#111827;background:white}.main{height:calc(100vh - 66px);display:flex;flex-direction:column;background:#0b1220}.sheet-panel{order:2;flex:1;min-height:0;background:radial-gradient(circle at top,#334155 0,#1f2937 50%,#111827 100%);padding:8px 14px 14px;overflow:hidden;display:flex;flex-direction:column}.side-panel{order:1;background:#eef2f7;color:#111827;overflow:visible;padding:10px 14px;display:grid;grid-template-columns:1.5fr 1fr auto;gap:10px;align-items:stretch;border-bottom:2px solid rgba(15,23,42,.15)}.mission-card{background:rgba(255,255,255,.97);color:#111827;border-radius:18px;padding:9px 12px;box-shadow:0 10px 24px rgba(0,0,0,.22);display:flex;align-items:center;gap:10px;margin-bottom:10px}.mission-icon{font-size:26px;flex:0 0 auto}.mission-title{font-size:16px;font-weight:900}.mission-sub{font-size:12px;color:#4b5563;margin-top:2px;line-height:1.25}.workbook{background:#f8fafc;color:#111827;border-radius:22px;box-shadow:0 25px 60px rgba(0,0,0,.38);overflow:hidden;border:7px solid #0f172a;width:100%;max-width:none;min-width:0;flex:1;display:flex;flex-direction:column}.formula-row{display:grid;grid-template-columns:80px minmax(180px,1fr) 82px;gap:8px;align-items:center;padding:7px 10px;background:#e2e8f0;border-bottom:1px solid #cbd5e1}.name-box{height:38px;border:1px solid #94a3b8;border-radius:10px;background:white;display:flex;align-items:center;justify-content:center;font-weight:900}.formula-input{height:38px;border:1px solid #94a3b8;border-radius:10px;padding:0 12px;font-weight:800;outline:none;width:100%;background:white}.formula-input:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15)}.write-btn{height:36px;padding:0 10px;border-radius:10px;background:#2563eb;color:white;border:0;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px rgba(37,99,235,.25)}.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:10px;background:#f1f5f9;border-bottom:1px solid #cbd5e1}.tool-btn,.tool-select{border:1px solid #cbd5e1;background:white;color:#111827;border-radius:10px;padding:9px 10px;font-weight:900;cursor:pointer}.tool-btn:hover{background:#dbeafe}.tool-btn.active{background:#bbf7d0;border-color:#22c55e}.sheet-wrap{overflow:auto;background:white;flex:1;min-height:360px}.sheet{display:grid;grid-template-columns:44px repeat(12,minmax(var(--cellW),1fr));grid-auto-rows:var(--cellH);position:relative;min-width:1180px;width:100%}.cell,.corner,.col-head,.row-head{border-right:1px solid #d1d5db;border-bottom:1px solid #d1d5db;display:flex;align-items:center;padding:0 8px;min-width:0;overflow:hidden;white-space:nowrap}.corner,.col-head,.row-head{background:#e5e7eb;font-weight:900;color:#374151;justify-content:center}.cell{background:white;cursor:pointer;font-size:14px;color:#111827}.cell-editor{width:100%;height:100%;border:0;outline:0;background:#fff;color:#111827;font:inherit;font-weight:800;padding:0 4px}.cell:hover{outline:2px solid rgba(37,99,235,.25);z-index:2}.cell.active{outline:3px solid #2563eb;z-index:4}.cell.selected{background:#dbeafe}.cell.target{box-shadow:inset 0 0 0 3px #f59e0b}.cell.good{box-shadow:inset 0 0 0 3px #22c55e}.cell.bad{box-shadow:inset 0 0 0 3px #ef4444}.cell.bold{font-weight:900}.cell.fmt-date{color:#7c2d12}.cell.fmt-currency::after{content:' KM';color:#64748b;margin-left:2px}.cell.fmt-percent::after{content:'%';color:#64748b;margin-left:1px}.cell.fill-yellow{background:#fef3c7}.cell.fill-green{background:#dcfce7}.cell.fill-blue{background:#dbeafe}.cell.fill-red{background:#fee2e2}.chart-box{margin:14px;background:white;border:2px solid #cbd5e1;border-radius:18px;min-height:190px;padding:12px;display:none}.chart-box.show{display:block}.chart-title{font-size:14px;font-weight:900;margin-bottom:8px;color:#334155}.chart-bars{display:flex;align-items:flex-end;gap:12px;height:130px;border-left:2px solid #cbd5e1;border-bottom:2px solid #cbd5e1;padding:8px}.bar{width:34px;background:linear-gradient(180deg,#60a5fa,#2563eb);border-radius:8px 8px 0 0;position:relative;min-height:8px}.bar span{position:absolute;bottom:-24px;left:50%;transform:translateX(-50%);font-size:11px;font-weight:900;color:#475569}.task-card{background:white;border-radius:18px;padding:12px 14px;box-shadow:0 8px 18px rgba(15,23,42,.10);border:1px solid #dbe2ea;margin:0}.chapter{display:inline-flex;width:max-content;align-items:center;gap:8px;border-radius:999px;background:#dcfce7;border:1px solid #86efac;color:#166534;padding:6px 10px;font-size:12px;font-weight:900;margin-bottom:8px}.task-title{font-size:18px;font-weight:900;line-height:1.15;margin-bottom:5px}.task-text{font-size:13px;color:#374151;line-height:1.35;font-weight:700}.concept{background:#0f172a;color:white;border-radius:18px;padding:12px;margin:0;box-shadow:0 8px 18px rgba(15,23,42,.14)}.concept b{display:block;color:#bfdbfe;margin-bottom:6px}.concept p{font-size:12px;line-height:1.35;color:#e5e7eb;font-weight:700}.action-panel{background:white;border-radius:18px;padding:10px;box-shadow:0 8px 18px rgba(15,23,42,.10);border:1px solid #dbe2ea;margin:0}.action-title{font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:#64748b;font-weight:900;margin-bottom:8px}.template-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.template-card{border:2px solid #cbd5e1;border-radius:16px;padding:12px;background:#f8fafc;cursor:pointer}.template-card:hover{border-color:#2563eb;background:#dbeafe}.template-card.active{border-color:#22c55e;background:#dcfce7}.template-card b{display:block;font-size:15px;margin-bottom:4px}.template-card span{font-size:12px;color:#64748b;font-weight:800}.control-row{display:flex;gap:10px;flex-wrap:wrap}.btn{border:none;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;padding:10px 13px;border-radius:13px;font-weight:900;cursor:pointer;box-shadow:0 8px 18px rgba(0,0,0,.14);white-space:nowrap}.btn.secondary{background:linear-gradient(135deg,#64748b,#475569)}.btn.good{background:linear-gradient(135deg,#22c55e,#15803d)}.btn.warn{background:linear-gradient(135deg,#f97316,#c2410c)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.btn:hover:not(:disabled){transform:translateY(-1px)}.feedback{border-radius:16px;padding:12px 14px;font-size:15px;font-weight:900;line-height:1.35;display:none;margin-top:12px}.feedback.show{display:block}.feedback.ok{background:#dcfce7;color:#166534}.feedback.no{background:#fee2e2;color:#991b1b}.mini-help{display:grid;gap:6px}.help-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:7px 8px}.help-item b{font-size:11px}.help-item p{font-size:12px;color:#64748b;margin-top:3px;font-weight:700}.overlay{position:fixed;inset:0;background:rgba(2,6,23,.78);display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;z-index:100;padding:20px}.overlay.show{display:flex}.overlay h2{font-size:42px;margin-bottom:10px}.overlay p{font-size:18px;color:#e5e7eb;max-width:560px;line-height:1.35;margin-bottom:16px}@media(max-width:1050px){body{overflow:auto}.topbar{position:sticky;top:0}.main{height:auto;min-height:calc(100vh - 66px)}.side-panel{display:block}.sheet-panel{min-height:620px}.task-card,.concept,.action-panel{margin-bottom:10px}}@media(max-width:620px){:root{--cellW:100px}.topbar{align-items:flex-start;flex-direction:column}.logo{font-size:19px}.pill,.level-select{font-size:12px;padding:8px 10px}.sheet-panel,.side-panel{padding:12px}.template-grid{grid-template-columns:1fr}.task-title{font-size:20px}.formula-row{grid-template-columns:70px 1fr}.write-btn{grid-column:1/3}.toolbar{gap:6px}.tool-btn,.tool-select{font-size:12px;padding:8px}}
+
+/* FINALNI KOMPAKTNI LAYOUT: tabela je glavni dio ekrana */
+body{overflow:hidden!important;}
+.main{height:calc(100vh - 66px)!important;display:flex!important;flex-direction:column!important;}
+.side-panel{order:1!important;flex:0 0 auto!important;padding:6px 10px!important;display:grid!important;grid-template-columns:minmax(320px,1fr) auto!important;gap:8px!important;align-items:center!important;max-height:112px!important;overflow:hidden!important;}
+.sheet-panel{order:2!important;flex:1 1 auto!important;min-height:0!important;padding:8px 10px 10px!important;}
+.concept,.side-panel .action-panel:has(#helpList){display:none!important;}
+.task-card{padding:8px 10px!important;border-radius:14px!important;box-shadow:none!important;min-width:0!important;}
+.chapter{font-size:10px!important;padding:3px 7px!important;margin-bottom:3px!important;}
+.task-title{font-size:15px!important;margin-bottom:2px!important;line-height:1.05!important;}
+.task-text{font-size:12px!important;line-height:1.2!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.action-panel{padding:7px!important;border-radius:14px!important;box-shadow:none!important;}
+.action-title{display:none!important;}
+.control-row{gap:6px!important;flex-wrap:nowrap!important;}
+.btn{padding:8px 10px!important;border-radius:10px!important;font-size:12px!important;}
+#templatePanel{max-width:440px!important;}
+.template-grid{grid-template-columns:repeat(4,minmax(90px,1fr))!important;gap:6px!important;}
+.template-card{padding:7px!important;border-radius:11px!important;}
+.template-card b{font-size:12px!important;margin-bottom:2px!important;}
+.template-card span{font-size:10px!important;line-height:1.1!important;display:block;}
+.workbook{flex:1 1 auto!important;min-height:0!important;border-width:5px!important;border-radius:18px!important;}
+.formula-row{grid-template-columns:66px minmax(140px,1fr) 62px!important;padding:5px 8px!important;gap:6px!important;}
+.name-box,.formula-input{height:32px!important;border-radius:8px!important;font-size:13px!important;}
+.write-btn{height:32px!important;border-radius:8px!important;font-size:12px!important;padding:0 8px!important;}
+.toolbar{padding:6px 8px!important;gap:6px!important;}
+.tool-btn,.tool-select{padding:6px 8px!important;border-radius:8px!important;font-size:12px!important;}
+.sheet-wrap{flex:1 1 auto!important;min-height:0!important;height:auto!important;}
+.sheet{min-width:1120px!important;}
+.chart-box{margin:8px!important;min-height:140px!important;padding:8px!important;}
+.chart-bars{height:90px!important;}
+.feedback{position:fixed;right:14px;bottom:14px;z-index:120;margin:0!important;max-width:420px;box-shadow:0 12px 30px rgba(0,0,0,.25);}
+@media(max-width:1050px){.side-panel{max-height:none!important;grid-template-columns:1fr!important;overflow:visible!important}.sheet-panel{min-height:620px!important}.control-row{flex-wrap:wrap!important}.concept{display:none!important}}
+
+
+
+/* DORADA v5: bolji grafikon, izmjena dimenzija ćelija, italic */
+.workbook{position:relative;}
+.toolbar{align-items:center;}
+.tool-btn.mini{padding:7px 9px;font-size:12px;}
+.cell.italic{font-style:italic;}
+.col-head,.row-head{position:relative;user-select:none;}
+.col-head.resized,.row-head.resized{background:#bbf7d0!important;}
+.chart-box{position:absolute!important;right:22px;bottom:18px;width:370px;min-height:205px;max-width:46vw;margin:0!important;z-index:55;box-shadow:0 16px 38px rgba(15,23,42,.28);cursor:default;}
+.chart-title{cursor:move;display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f1f5f9;margin:-12px -12px 8px;padding:9px 12px;border-radius:16px 16px 0 0;border-bottom:1px solid #cbd5e1;font-size:13px!important;}
+.chart-title::after{content:'↔ pomjeri';font-size:10px;color:#64748b;font-weight:900;}
+.chart-bars{height:122px!important;gap:8px!important;padding:16px 8px 28px!important;align-items:flex-end!important;overflow:visible;}
+.bar{width:28px!important;border-radius:7px 7px 0 0;background:linear-gradient(180deg,#60a5fa,#2563eb);}
+.bar .value-label{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:10px;color:#111827;font-weight:900;background:#fff;border:1px solid #cbd5e1;border-radius:999px;padding:1px 4px;white-space:nowrap;}
+.bar span{bottom:-23px!important;font-size:10px!important;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:900px){.chart-box{max-width:78vw;width:330px;right:10px;bottom:10px}.chart-bars{gap:6px!important}.bar{width:22px!important}}
+
+
+
+/* DORADA v6: veličina ćelija kao u Sheetsu - povlačenje granica */
+.sheet{min-width:1364px!important;}
+.cell{font-size:15px!important;}
+.col-head,.row-head{position:relative!important;overflow:visible!important;}
+.col-resizer{position:absolute;right:-4px;top:0;width:8px;height:100%;cursor:col-resize;z-index:20;background:transparent;}
+.col-resizer:hover,.col-resizer.active{background:rgba(37,99,235,.28);}
+.row-resizer{position:absolute;left:0;right:0;bottom:-4px;height:8px;cursor:row-resize;z-index:20;background:transparent;}
+.row-resizer:hover,.row-resizer.active{background:rgba(37,99,235,.28);}
+body.resizing-sheet,body.resizing-sheet *{user-select:none!important;}
+.resize-guide{position:fixed;z-index:9999;background:#2563eb;color:white;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:900;pointer-events:none;box-shadow:0 8px 20px rgba(0,0,0,.25);}
+
+
+/* v7: ciljne ćelije su jasno žute, posebno kada ih ima više */
+.cell.target{background:#fef08a!important;box-shadow:inset 0 0 0 3px #f59e0b,0 0 0 2px rgba(245,158,11,.22)!important;font-weight:900;}
+.cell.target.selected{background:#fde68a!important;}
+
+/* v9: ljepši grafikoni + tortni grafikon */
+.chart-box{width:340px!important;min-height:188px!important;}
+.chart-title{user-select:none;touch-action:none;}
+.chart-bars{height:112px!important;}
+.bar{background:linear-gradient(180deg,#93c5fd,#2563eb)!important;}
+.value-label{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-style:normal;font-size:10px;font-weight:900;color:#334155;background:#f8fafc;border:1px solid #cbd5e1;border-radius:999px;padding:1px 5px;white-space:nowrap;}
+.pie-wrap{display:grid;grid-template-columns:120px 1fr;gap:14px;align-items:center;min-height:124px;padding:8px 4px;}
+.pie{width:116px;height:116px;border-radius:50%;border:2px solid #cbd5e1;box-shadow:inset 0 0 0 8px rgba(255,255,255,.45),0 8px 18px rgba(15,23,42,.12);}
+.pie-legend{display:grid;gap:5px;font-size:12px;font-weight:800;color:#334155;}
+.pie-item{display:flex;align-items:center;gap:6px;min-width:0;}
+.pie-swatch{width:12px;height:12px;border-radius:4px;flex:0 0 auto;border:1px solid rgba(15,23,42,.18);}
+.pie-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+@media(max-width:900px){.chart-box{width:310px!important}.pie-wrap{grid-template-columns:100px 1fr}.pie{width:96px;height:96px}}
+
+
+/* v10: fill handle kao u Sheetsu */
+.cell{position:relative;}
+.fill-handle{
+  position:absolute;
+  width:9px;height:9px;
+  right:-5px;bottom:-5px;
+  background:#2563eb;
+  border:2px solid #fff;
+  border-radius:3px;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+  cursor:crosshair;
+  z-index:20;
+}
+.cell.fill-preview{background:#dcfce7!important;box-shadow:inset 0 0 0 2px #22c55e;}
+body.dragging-fill{cursor:crosshair!important;user-select:none;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo"><span class="logo-badge"><img class="logo-img" src="https://nihadm97.github.io/Portfolio/static/media/logo.7156bdbd7cb0672472b8.png" alt="Logo"></span> Laboratorija proračunskih tablica</div>
+  <div class="top-info"><div class="pill" id="levelIndicator">Nivo 1 / 58</div><div class="pill" id="modeIndicator">Uvod</div><select class="level-select" id="levelSelect" onchange="jumpToLevel()"></select></div>
+</div>
+<div class="main">
+  <section class="sheet-panel">
+    <div class="workbook">
+      <div class="formula-row"><div class="name-box" id="nameBox">A1</div><input class="formula-input" id="formulaInput" placeholder="Klikni ćeliju pa upiši tekst, broj ili formulu npr. =SUM(B2:B6)"><button class="write-btn" onclick="commitFormula()">Upiši</button></div>
+      <div class="toolbar">
+        <select class="tool-select" id="formatSelect" onchange="setFormat(this.value)"><option value="automatic">Automatski</option><option value="number">Broj</option><option value="date">Datum</option><option value="currency">Valuta KM</option><option value="percent">Procenat</option></select>
+        <button class="tool-btn" onclick="toggleBold()">B</button><button class="tool-btn" onclick="setFill('yellow')">Žuta</button><button class="tool-btn" onclick="setFill('green')">Zelena</button><button class="tool-btn" onclick="setFill('blue')">Plava</button><button class="tool-btn" onclick="changeDecimals(1)">+ decimala</button><button class="tool-btn" onclick="changeDecimals(-1)">− decimala</button><button class="tool-btn" onclick="deleteCell()">Obriši</button><button class="tool-btn" onclick="insertChart()">Stupčasti grafikon</button><button class="tool-btn" onclick="insertPieChart()">Tortni grafikon</button><button class="tool-btn" onclick="sortSelection()">Sortiraj raspon</button>
+      </div>
+      <div class="sheet-wrap"><div class="sheet" id="sheet"></div></div>
+      <div class="chart-box" id="chartBox"><div class="chart-title" id="chartTitle">Grafikon</div><div class="chart-bars" id="chartBars"></div></div>
+    </div>
+  </section>
+  <aside class="side-panel">
+    <div class="task-card"><div class="chapter" id="chapterBadge">📌 Pojam</div><div class="task-title" id="taskTitle">Naslov zadatka</div><div class="task-text" id="taskText">Opis zadatka.</div><div class="feedback" id="feedback"></div></div>
+    <div class="concept" id="conceptBox"><b>Objašnjenje</b><p id="conceptText">Kratko objašnjenje novog pojma.</p></div>
+    <div class="action-panel" id="templatePanel"><div class="action-title">Gotovi predlošci</div><div class="template-grid" id="templateGrid"></div></div>
+    <div class="action-panel"><div class="action-title">Pomoć za rad</div><div class="mini-help" id="helpList"></div></div>
+    <div class="action-panel"><div class="action-title">Kontrole</div><div class="control-row"><button class="btn good" onclick="checkLevel()">Provjeri</button><button class="btn secondary" onclick="resetLevel()">Vrati nivo</button><button class="btn warn" onclick="nextLevel()" id="nextBtn" disabled>Sljedeći nivo</button></div></div>
+  </aside>
+</div>
+<div class="overlay" id="overlay"><h2 id="overlayTitle">Bravo!</h2><p id="overlayText">Nivo je završen.</p><button class="btn secondary" onclick="closeOverlay()">Zatvori</button></div>
+<script>
+const ROWS=14,COLS=12,letters='ABCDEFGHIJKL'.split('');
+let cells={},active='A1',selection=[],dragging=false,dragStart=null,currentLevel=0,completed={},chartInserted=false,chartRange='',chosenTemplate=null,formulaTarget='A1',formulaPickMode=false;
+let editingCell=null,editingInput=null,formulaPickBase='';
+const sheet=document.getElementById('sheet'),formulaInput=document.getElementById('formulaInput'),nameBox=document.getElementById('nameBox');
+formulaInput.addEventListener('focus',()=>{formulaTarget=active});
+formulaInput.addEventListener('input',()=>{formulaPickMode=formulaInput.value.trim().startsWith('=');formulaPickBase=''});
+formulaInput.addEventListener('keydown',e=>{if(e.key==='Enter')commitFormula()});
+const templates={
+ budget:{name:'Budžet izleta',desc:'Troškovi prevoza, hrane i ulaznica.',data:[['Stavka','Iznos'],['Prevoz',120],['Hrana',85],['Ulaznice',60],['Materijal',35],['Ukupno','']]},
+ grades:{name:'Evidencija ocjena',desc:'Imena učenika i ocjene po predmetu.',data:[['Učenik','Ocjena'],['Amina',5],['Emir',4],['Sara',5],['Mak',3],['Prosjek','']]},
+ attendance:{name:'Prisustvo',desc:'Broj prisutnih učenika po danima.',data:[['Dan','Prisutni'],['Ponedjeljak',22],['Utorak',20],['Srijeda',24],['Četvrtak',21],['Petak',23]]},
+ shop:{name:'Školska prodavnica',desc:'Proizvodi, cijene i količine.',data:[['Proizvod','Cijena','Količina'],['Sveska',2,12],['Olovka',1,30],['Marker',3,8],['Papir',5,6]]}
+};
+function blankCells(){cells={};for(let r=1;r<=ROWS;r++){for(let c=0;c<COLS;c++){cells[letters[c]+r]={v:'',formula:'',fmt:'automatic',dec:null,bold:false,fill:''}}}}
+function setCell(addr,v,extra={}){if(!cells[addr])return;cells[addr]={...cells[addr],v,formula:String(v).startsWith('=')?String(v):'',...extra}}
+function getCell(addr){return cells[addr]?.v??''}
+function addr(c,r){return letters[c]+r}
+function parseAddr(a){const m=String(a).toUpperCase().match(/^([A-L])(\d{1,2})$/);if(!m)return null;const r=+m[2];if(r<1||r>ROWS)return null;return {c:letters.indexOf(m[1]),r}}
+function rangeAddrs(range){const m=String(range).toUpperCase().match(/^([A-L]\d{1,2}):([A-L]\d{1,2})$/);if(!m){const p=parseAddr(range);return p?[range.toUpperCase()]:[]}const a=parseAddr(m[1]),b=parseAddr(m[2]);let out=[];for(let r=Math.min(a.r,b.r);r<=Math.max(a.r,b.r);r++){for(let c=Math.min(a.c,b.c);c<=Math.max(a.c,b.c);c++){out.push(addr(c,r))}}return out}
+function valuesFromRange(range){return rangeAddrs(range).map(a=>getCell(a)).filter(v=>v!==''&&v!==null&&v!==undefined)}
+function nums(range){return valuesFromRange(range).map(x=>Number(String(x).replace(',','.'))).filter(x=>!Number.isNaN(x))}
+function todayStr(){const d=new Date();return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}.`}
+function parseDateValue(v){if(v instanceof Date)return v;let s=String(v).trim();let m=s.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})\.?$/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);return new Date(s)}
+function evalFormula(f){let s=String(f).trim();if(!s.startsWith('='))return s;s=s.slice(1).toUpperCase().replace(/\s+/g,'');let m;if((m=s.match(/^SUM\(([^)]+)\)$/)))return nums(m[1]).reduce((a,b)=>a+b,0);if((m=s.match(/^COUNT\(([^)]+)\)$/)))return nums(m[1]).length;if((m=s.match(/^AVERAGE\(([^)]+)\)$/))){const n=nums(m[1]);return n.length?n.reduce((a,b)=>a+b,0)/n.length:''}if((m=s.match(/^MAX\(([^)]+)\)$/))){const n=nums(m[1]);return n.length?Math.max(...n):''}if((m=s.match(/^MIN\(([^)]+)\)$/))){const n=nums(m[1]);return n.length?Math.min(...n):''}if(s==='NOW()')return todayStr();if((m=s.match(/^DAY\(([^)]+)\)$/))){let d=parseDateValue(getCell(m[1]));return Number.isNaN(d.getTime())?'':d.getDate()}if((m=s.match(/^MONTH\(([^)]+)\)$/))){let d=parseDateValue(getCell(m[1]));return Number.isNaN(d.getTime())?'':d.getMonth()+1}if((m=s.match(/^YEAR\(([^)]+)\)$/))){let d=parseDateValue(getCell(m[1]));return Number.isNaN(d.getTime())?'':d.getFullYear()}if((m=s.match(/^WEEKDAY\(([^)]+)\)$/))){let d=parseDateValue(getCell(m[1]));return Number.isNaN(d.getTime())?'':d.getDay()+1}if((m=s.match(/^SORT\(([^)]+)\)$/))){return valuesFromRange(m[1]).slice().sort((a,b)=>String(a).localeCompare(String(b),'bs',{numeric:true}))}return '#GREŠKA'}
+function normFormula(s){return String(s||'').toUpperCase().replace(/\s+/g,'').replace(/;/g,',')}
+function rangeTextFromSelection(){if(!selection.length)return '';let ps=selection.map(parseAddr).filter(Boolean);let minR=Math.min(...ps.map(p=>p.r)),maxR=Math.max(...ps.map(p=>p.r)),minC=Math.min(...ps.map(p=>p.c)),maxC=Math.max(...ps.map(p=>p.c));let first=addr(minC,minR),last=addr(maxC,maxR);return first===last?first:first+':'+last}
+function formulaSource(){
+  // v7: čim unos počinje znakom =, klik/prevlačenje po ćelijama ubacuje adrese ćelija.
+  if(editingInput&&document.body.contains(editingInput)){
+    const v=editingInput.value.trim();
+    if(v.startsWith('='))return {input:editingInput,target:editingCell,type:'cell'};
+  }
+  const v=formulaInput.value.trim();
+  if(v.startsWith('='))return {input:formulaInput,target:formulaTarget||active,type:'bar'};
+  return null;
+}
+function formulaMode(v){
+  v=String(v||'').trim();
+  const i=v.lastIndexOf('(');
+  const j=v.lastIndexOf(')');
+  if(i>=0 && i>j && /^=[A-Z]+\(/i.test(v.slice(0,i+1)))return 'rangeFunction';
+  return 'reference';
+}
+function formulaBase(v){
+  v=String(v||'').trim();
+  if(formulaMode(v)==='rangeFunction'){const i=v.lastIndexOf('(');return v.slice(0,i+1)}
+  return v;
+}
+function isFormulaPicking(){return !!formulaSource()}
+function updateSelectionClasses(){
+  document.querySelectorAll('.cell.selected').forEach(e=>e.classList.remove('selected'));
+  selection.forEach(a=>{const el=document.querySelector(`.cell[data-addr="${a}"]`);if(el)el.classList.add('selected')});
+}
+function targetAddrsForLevel(L=levels[currentLevel]){
+  const out=new Set();
+  if(!L)return [];
+  if(L.target)out.add(L.target);
+  (L.targets||[]).forEach(a=>out.add(a));
+  if(L.expectFormulas)Object.keys(L.expectFormulas).forEach(a=>out.add(a));
+  if(L.expectFill?.range)rangeAddrs(L.expectFill.range).forEach(a=>out.add(a));
+  if(L.expectFmtRange?.range)rangeAddrs(L.expectFmtRange.range).forEach(a=>out.add(a));
+  if(L.expectBoldCell)out.add(L.expectBoldCell);
+  if(L.expectItalicCell)out.add(L.expectItalicCell);
+  return [...out];
+}
+function buildFormulaPreview(src,rng){
+  const current=src.input.value;
+  if(!formulaPickBase)formulaPickBase=formulaBase(current);
+  if(formulaMode(current)==='rangeFunction')return formulaPickBase+rng+')';
+  return formulaPickBase+rng;
+}
+function previewRangeInFormula(){
+  const src=formulaSource();if(!src)return;
+  const rng=rangeTextFromSelection();if(!rng)return;
+  src.input.value=buildFormulaPreview(src,rng);
+  if(src.type==='cell')formulaInput.value=src.input.value;
+  if(src.type==='bar'){active=src.target;nameBox.textContent=active;formulaTarget=src.target;}
+  else {active=src.target;formulaTarget=src.target;nameBox.textContent=src.target;}
+}
+function finishRangePick(){
+  const src=formulaSource();
+  previewRangeInFormula();
+  formulaPickBase='';
+  if(src){setTimeout(()=>{src.input.focus();src.input.setSelectionRange(src.input.value.length,src.input.value.length)},0)}
+}
+function renderSheet(){
+  sheet.innerHTML='';
+  const corner=document.createElement('div');corner.className='corner';sheet.appendChild(corner);
+  letters.forEach(l=>{const e=document.createElement('div');e.className='col-head';e.textContent=l;sheet.appendChild(e)});
+  for(let r=1;r<=ROWS;r++){
+    const rh=document.createElement('div');rh.className='row-head';rh.textContent=r;sheet.appendChild(rh);
+    for(let c=0;c<COLS;c++){
+      const a=addr(c,r),data=cells[a];
+      const el=document.createElement('div');el.className='cell';el.dataset.addr=a;el.textContent=displayCell(a);
+      if(a===active)el.classList.add('active');
+      if(selection.includes(a))el.classList.add('selected');
+      if(data.bold)el.classList.add('bold');
+      if(data.fmt==='date')el.classList.add('fmt-date');
+      if(data.fmt==='currency')el.classList.add('fmt-currency');
+      if(data.fmt==='percent')el.classList.add('fmt-percent');
+      if(data.fill)el.classList.add('fill-'+data.fill);
+      if(targetAddrsForLevel().includes(a))el.classList.add('target');
+      el.onmousedown=(ev)=>{
+        if(ev.detail>=2){ev.preventDefault();ev.stopPropagation();dragging=false;return;}
+        dragging=true;dragStart=a;selection=[a];
+        if(isFormulaPicking()){formulaPickBase='';previewRangeInFormula();updateSelectionClasses();return;}
+        if(editingInput&&document.body.contains(editingInput)){return;}
+        selectCell(a);renderSheet();
+      };
+      el.onmouseenter=()=>{if(dragging&&dragStart){selection=makeRect(dragStart,a);if(isFormulaPicking()){previewRangeInFormula();updateSelectionClasses()}else renderSheet()}};
+      el.onmouseup=()=>{if(isFormulaPicking()){finishRangePick()} dragging=false;};
+      el.ondblclick=(ev)=>{ev.preventDefault();ev.stopPropagation();dragging=false;editCellInline(a)};
+      sheet.appendChild(el);
+    }
+  }
+}
+window.addEventListener('mouseup',()=>{if(dragging&&isFormulaPicking())finishRangePick();dragging=false});
+function displayCell(a){let d=cells[a];let v=d.v;if(Array.isArray(v))return v.join(', ');if(v===''||v===null||v===undefined)return '';if(d.fmt==='number'&&d.dec!==null&&!Number.isNaN(Number(v)))return Number(v).toFixed(d.dec);if(d.fmt==='currency'&&d.dec!==null&&!Number.isNaN(Number(v)))return Number(v).toFixed(d.dec);if(d.fmt==='percent'&&d.dec!==null&&!Number.isNaN(Number(v)))return Number(v).toFixed(d.dec);return String(v)}
+function makeRect(a,b){const A=parseAddr(a),B=parseAddr(b);let out=[];for(let r=Math.min(A.r,B.r);r<=Math.max(A.r,B.r);r++){for(let c=Math.min(A.c,B.c);c<=Math.max(A.c,B.c);c++)out.push(addr(c,r))}return out}
+function selectCell(a){active=a;formulaTarget=a;formulaPickMode=false;editingCell=null;editingInput=null;formulaPickBase='';nameBox.textContent=a;formulaInput.value=cells[a].formula||cells[a].v||'';document.getElementById('formatSelect').value=cells[a].fmt||'automatic'}
+function commitFormula(rawOverride=null){let raw=(rawOverride!==null?String(rawOverride):formulaInput.value).trim();active=formulaTarget||active;let result=evalFormula(raw);if(Array.isArray(result)){let p=parseAddr(active);result.forEach((v,i)=>{if(p.r+i<=ROWS)setCell(addr(p.c,p.r+i),v,{formula:i===0?raw:''})})}else setCell(active,result,{formula:raw.startsWith('=')?raw:''});formulaPickMode=false;editingCell=null;editingInput=null;formulaPickBase='';formulaInput.value=cells[active].formula||cells[active].v||'';renderSheet();flash(`Upisano u ${active}.`,'ok')}
+function editCellInline(a){active=a;formulaTarget=a;formulaPickMode=false;formulaPickBase='';nameBox.textContent=a;const el=document.querySelector(`.cell[data-addr="${a}"]`);if(!el)return;const old=cells[a].formula||cells[a].v||'';el.classList.add('active');el.innerHTML=`<input class="cell-editor" value="${String(old).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">`;const inp=el.querySelector('input');editingCell=a;editingInput=inp;formulaInput.value=inp.value;setTimeout(()=>{inp.focus();inp.select();},0);inp.addEventListener('input',()=>{formulaInput.value=inp.value;if(inp.value.trim().startsWith('='))formulaPickBase=''});inp.addEventListener('mousedown',e=>e.stopPropagation());inp.addEventListener('click',e=>e.stopPropagation());inp.addEventListener('dblclick',e=>e.stopPropagation());inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();formulaInput.value=inp.value;commitFormula(inp.value)}else if(e.key==='Escape'){e.preventDefault();editingCell=null;editingInput=null;formulaPickBase='';renderSheet()}})}
+function deleteCell(){editingCell=null;editingInput=null;formulaPickBase='';setCell(active,'',{formula:'',fmt:'automatic',dec:null,bold:false,fill:''});formulaInput.value='';renderSheet()}
+function setFormat(fmt){selectionOrActive().forEach(a=>{cells[a].fmt=fmt;if(fmt==='number'||fmt==='currency'||fmt==='percent')cells[a].dec=cells[a].dec??2});renderSheet()}
+function toggleBold(){selectionOrActive().forEach(a=>cells[a].bold=!cells[a].bold);renderSheet()}
+function setFill(color){selectionOrActive().forEach(a=>cells[a].fill=color);renderSheet()}
+function changeDecimals(delta){selectionOrActive().forEach(a=>{let d=cells[a];d.fmt=d.fmt==='automatic'?'number':d.fmt;d.dec=Math.max(0,Math.min(4,(d.dec??0)+delta))});renderSheet()}
+function selectionOrActive(){return selection.length?selection:[active]}
+function loadTemplate(key){chosenTemplate=key;blankCells();templates[key].data.forEach((row,ri)=>row.forEach((v,ci)=>setCell(addr(ci,ri+1),v,{bold:ri===0,fill:ri===0?'blue':''})));selection=[];chartInserted=false;hideChart();renderAll()}
+function insertChart(){const rng=selection.length?selection:rangeAddrs('A2:B6');const pairs=[];let rows={};rng.forEach(a=>{const p=parseAddr(a);rows[p.r]=rows[p.r]||{};rows[p.r][p.c]=getCell(a)});Object.keys(rows).map(Number).sort((a,b)=>a-b).forEach(r=>{let row=rows[r];let keys=Object.keys(row).map(Number).sort((a,b)=>a-b);let vals=keys.map(k=>row[k]);if(vals.length>=2&&!Number.isNaN(Number(String(vals[1]).replace(',','.'))))pairs.push([vals[0],Number(String(vals[1]).replace(',','.'))])});if(!pairs.length){flash('Odaberi raspon sa nazivima i brojevima, npr. A2:B6, pa ubaci grafikon.','no');return}chartInserted=true;chartRange=rangeTextFromSelection();const max=Math.max(...pairs.map(p=>p[1]));document.getElementById('chartBox').classList.add('show');document.getElementById('chartTitle').textContent='Grafikon iz odabranog raspona';const bars=document.getElementById('chartBars');bars.innerHTML='';pairs.forEach(([lab,val])=>{const b=document.createElement('div');b.className='bar';b.style.height=Math.max(8,Math.round((val/max)*112))+'px';b.title=lab+': '+val;const s=document.createElement('span');s.textContent=String(lab).slice(0,8);b.appendChild(s);bars.appendChild(b)});flash('Grafikon je ubačen iz podataka koje si označio/označila.','ok')}
+function hideChart(){chartInserted=false;chartRange='';document.getElementById('chartBox').classList.remove('show')}
+function sortSelection(){const rng=selection.length?selection:rangeAddrs('A2:A6');if(!rng.length)return;const vals=rng.map(a=>getCell(a)).filter(v=>v!=='').sort((a,b)=>String(a).localeCompare(String(b),'bs',{numeric:true}));rng.forEach((a,i)=>setCell(a,vals[i]||''));renderSheet();flash('Raspon je sortiran rastuće.','ok')}
+function flash(msg,type){const f=document.getElementById('feedback');f.textContent=msg;f.className='feedback show '+(type==='ok'?'ok':'no')}
+function closeOverlay(){document.getElementById('overlay').classList.remove('show')}
+function showOverlay(title,text){document.getElementById('overlayTitle').textContent=title;document.getElementById('overlayText').textContent=text;document.getElementById('overlay').classList.add('show')}
+const baseLevels=[
+{icon:'🧾',mode:'Predlošci',chapter:'Gotovi predlošci',name:'Otvori predložak budžeta',concept:'Predložak je već pripremljena tabela. U Google Sheets možeš početi od prazne tabele ili od gotovog predloška, npr. budžet, raspored ili evidencija.',task:'Klikni predložak “Budžet izleta”. Pogledaj kako su kolone već pripremljene.',needTemplate:'budget'},
+{icon:'🧾',mode:'Predlošci',chapter:'Gotovi predlošci',name:'Otvori evidenciju ocjena',concept:'Predložak štedi vrijeme jer već ima nazive kolona i osnovni raspored. Ti kasnije mijenjaš podatke, formule i format.',task:'Klikni predložak “Evidencija ocjena”.',needTemplate:'grades'},
+{icon:'✍️',mode:'Ćelije',chapter:'Upis u ćelije',name:'Klikni i upiši u ćeliju',concept:'Ćelija je jedno polje u tabeli. Njena adresa nastaje od slova kolone i broja reda, npr. B2.',task:'Klikni ćeliju A1, upiši “Predmet” i potvrdi dugmetom “Upiši u ćeliju”.',setup:'blank',target:'A1',expectValue:'Predmet'},
+{icon:'✍️',mode:'Ćelije',chapter:'Upis u ćelije',name:'Upiši broj u ćeliju',concept:'U ćeliju možemo upisati tekst, broj, datum ili formulu. Brojevi se poslije mogu sabirati i koristiti u funkcijama.',task:'U ćeliju B2 upiši broj 25.',setup:'blank',target:'B2',expectValue:25},
+{icon:'🧽',mode:'Ćelije',chapter:'Brisanje sadržaja',name:'Obriši pogrešan unos',concept:'Brisanje sadržaja ćelije uklanja tekst ili broj, ali tabela ostaje ista. To je korisno kada je podatak pogrešno upisan.',task:'U ćeliji C3 piše pogrešan podatak. Klikni C3 i pritisni “Obriši”.',setup:(s)=>{setCell('C3','GREŠKA')},target:'C3',expectValue:''},
+{icon:'🎨',mode:'Format',chapter:'Formatiranje ćelija',name:'Format broja',concept:'Format određuje kako se podatak prikazuje. Isti broj može biti običan broj, valuta, procenat ili datum.',task:'Klikni B2 i postavi format “Broj”.',setup:(s)=>{setCell('B2',15.5)},target:'B2',expectFmt:'number'},
+{icon:'💵',mode:'Format',chapter:'Formatiranje ćelija',name:'Format valute',concept:'Kada su podaci novčani iznosi, koristi se format valute. Tako se lakše vidi da broj predstavlja novac.',task:'Klikni B2 i postavi format “Valuta KM”.',setup:(s)=>{setCell('A2','Trošak');setCell('B2',8)},target:'B2',expectFmt:'currency'},
+{icon:'📅',mode:'Format',chapter:'Formatiranje ćelija',name:'Format datuma',concept:'Datum je poseban tip podatka. Iz datuma kasnije možemo dobiti dan, mjesec ili godinu pomoću funkcija.',task:'Klikni B2 i postavi format “Datum”.',setup:(s)=>{setCell('A2','Datum');setCell('B2','17.05.2026.')},target:'B2',expectFmt:'date'},
+{icon:'🔢',mode:'Format',chapter:'Decimalna mjesta',name:'Podesi decimalu',concept:'Kod decimalnih brojeva možemo odrediti koliko decimalnih mjesta želimo prikazati. To ne mora promijeniti vrijednost, samo prikaz.',task:'Klikni B2, formatiraj kao broj i postavi 2 decimalna mjesta.',setup:(s)=>{setCell('B2',3.14159,{fmt:'number',dec:0})},target:'B2',expectFmt:'number',expectDec:2},
+{icon:'📊',mode:'Grafikoni',chapter:'Grafikon',name:'Ubaci stupčasti grafikon',concept:'Stupčasti grafikon vizuelno poredi vrijednosti po kategorijama. Prvo se označi raspon, zatim se ubaci grafikon.',task:'Označi raspon A2:B6 prevlačenjem preko ćelija, pa klikni “Stupčasti grafikon”.',setup:(s)=>loadData([['Dan','Prisutni'],['Pon',22],['Uto',20],['Sri',24],['Čet',21],['Pet',23]]) ,needChart:true,needSelection:'A2:B6'},
+{icon:'📊',mode:'Grafikoni',chapter:'Grafikon',name:'Grafikon iz troškova',concept:'Stubičasti grafikon je dobar kada poredimo vrijednosti po kategorijama, npr. troškove po stavkama.',task:'Označi A2:B5 i klikni “Stupčasti grafikon”.',setup:(s)=>loadData([['Stavka','KM'],['Prevoz',120],['Hrana',85],['Ulaz',60],['Materijal',35]]),needChart:true,needSelection:'A2:B5'},
+{icon:'🥧',mode:'Grafikoni',chapter:'Tortni grafikon',name:'Tortni grafikon udjela',concept:'Tortni grafikon prikazuje dijelove jedne cjeline. Dobar je kada želiš vidjeti koliki udio ima svaka kategorija.',task:'Označi A2:B5 i klikni “Tortni grafikon”.',setup:(s)=>loadData([['Aktivnost','Učenici'],['Fudbal',12],['Rukomet',8],['Robotika',6],['Likovna',4]]),needChart:true,needSelection:'A2:B5'}
+];
+function loadData(rows){rows.forEach((row,ri)=>row.forEach((v,ci)=>setCell(addr(ci,ri+1),v,{bold:ri===0,fill:ri===0?'blue':''})))}
+const funcs=[
+{name:'SUM',what:'sabira brojeve u rasponu',examples:[['B2:B6','B7',[10,12,8,15,5]],['C2:C5','C6',[3,7,9,11]],['B2:B4','B5',[120,85,60]]]},
+{name:'COUNT',what:'broji koliko ćelija sadrži brojeve',examples:[['B2:B7','B8',[5,4,'odsutan',3,5,4]],['C2:C6','C7',[1,'-',1,1,'']],['B2:B5','B6',[22,20,24,21]]]},
+{name:'AVERAGE',what:'računa prosjek brojeva',examples:[['B2:B6','B7',[5,4,5,3,4]],['C2:C5','C6',[12,10,8,14]],['B2:B4','B5',[20,24,22]]]},
+{name:'MAX',what:'pronalazi najveću vrijednost',examples:[['B2:B6','B7',[22,20,24,21,23]],['C2:C5','C6',[8,15,9,12]],['B2:B4','B5',[120,85,60]]]},
+{name:'MIN',what:'pronalazi najmanju vrijednost',examples:[['B2:B6','B7',[22,20,24,21,23]],['C2:C5','C6',[8,15,9,12]],['B2:B4','B5',[120,85,60]]]},
+{name:'NOW',what:'upisuje trenutni datum i vrijeme',examples:[['','B2',[]]]},
+{name:'DAY',what:'uzima dan iz datuma',examples:[['B2','C2',['17.05.2026.']],['B2','C2',['03.09.2026.']],['B2','C2',['25.12.2026.']]]},
+{name:'MONTH',what:'uzima mjesec iz datuma',examples:[['B2','C2',['17.05.2026.']],['B2','C2',['03.09.2026.']],['B2','C2',['25.12.2026.']]]},
+{name:'YEAR',what:'uzima godinu iz datuma',examples:[['B2','C2',['17.05.2026.']],['B2','C2',['03.09.2026.']],['B2','C2',['25.12.2026.']]]},
+{name:'SORT',what:'sortira podatke u rastućem redoslijedu',examples:[['A2:A6','C2',['Tuzla','Sarajevo','Zenica','Bihać','Mostar']],['A2:A5','C2',[14,8,22,5]],['B2:B6','D2',['Petak','Utorak','Ponedjeljak','Srijeda','Četvrtak']]]},
+{name:'WEEKDAY',what:'vraća broj dana u sedmici za datum',examples:[['B2','C2',['17.05.2026.']],['B2','C2',['03.09.2026.']],['B2','C2',['25.12.2026.']]]}
+];
+function makeFormulaLevels(){const out=[];funcs.forEach(fn=>fn.examples.forEach((ex,i)=>{out.push({icon:'ƒ',mode:'Funkcije',chapter:'Funkcija '+fn.name,name:`${fn.name} primjer ${i+1}`,concept:`${fn.name} se koristi kada želiš da ${fn.what}. Formula se uvijek počinje znakom =.`,task:formulaTask(fn.name,ex[0],ex[1]),setup:()=>setupFormula(fn.name,ex),target:ex[1],expectFormula:expectedFormula(fn.name,ex[0])})}));return out}
+function setupFormula(name,ex){const [range,target,vals]=ex;if(name==='NOW'){setCell('A1','Upiši formulu za trenutni datum');return}if(['DAY','MONTH','YEAR','WEEKDAY'].includes(name)){setCell('A1','Datum');setCell(range,vals[0],{fmt:'date'});return}const addrs=rangeAddrs(range);if(name==='SORT'){setCell('A1','Podaci');addrs.forEach((a,i)=>setCell(a,vals[i]));return}setCell('A1','Vrijednosti');addrs.forEach((a,i)=>setCell(a,vals[i]));}
+function expectedFormula(name,range){if(name==='NOW')return '=NOW()';return `=${name}(${range})`}
+function formulaTask(name,range,target){if(name==='NOW')return `Klikni ${target} i upiši formulu =NOW().`;if(name==='SORT')return `Klikni ${target}, upiši =SORT( pa prevuci ${range}; raspon se sam dodaje u formulu.`;return `Klikni ${target}, upiši =${name}( pa prevuci ${range}; raspon se sam dodaje u formulu.`}
+const mixed=[
+['SUM','B2:B6','B7',[12,15,11,14,10],'Izračunaj ukupan broj bodova.'],['AVERAGE','B2:B6','B7',[5,4,5,3,4],'Izračunaj prosjek ocjena.'],['MAX','B2:B6','B7',[21,19,24,22,20],'Pronađi najveću posjetu.'],['MIN','B2:B6','B7',[120,85,60,35,25],'Pronađi najmanji trošak.'],['COUNT','B2:B7','B8',[5,'-',4,3,'odsutan',5],'Prebroj samo brojčane ocjene.'],['DAY','B2','C2',['09.06.2026.'],'Izvuci dan iz datuma.'],['MONTH','B2','C2',['09.06.2026.'],'Izvuci mjesec iz datuma.'],['YEAR','B2','C2',['09.06.2026.'],'Izvuci godinu iz datuma.'],['WEEKDAY','B2','C2',['09.06.2026.'],'Odredi broj dana u sedmici.'],['SORT','A2:A6','C2',['Tuzla','Mostar','Sarajevo','Bihać','Zenica'],'Sortiraj gradove.'],['SUM','B2:B5','B6',[120,85,60,35],'Saberi troškove izleta.'],['AVERAGE','B2:B5','B6',[22,20,24,21],'Izračunaj prosječno prisustvo.'],['MAX','B2:B5','B6',[3,8,6,11],'Pronađi najveću količinu.'],['MIN','B2:B5','B6',[3,8,6,11],'Pronađi najmanju količinu.'],['COUNT','B2:B6','B7',[1,1,'',1,'-'],'Prebroj dane sa upisanim brojem.'],['SUM','B2:B6','B7',[2,1,3,5,4],'Saberi prodate proizvode.'],['SORT','A2:A5','C2',[14,8,22,5],'Sortiraj brojeve.'],['NOW','','B2',[],'Upiši trenutni datum pomoću NOW.'],['AVERAGE','B2:B6','B7',[10,9,8,10,7],'Izračunaj prosjek rezultata.'],['SUM','B2:B6','B7',[22,20,24,21,23],'Saberi sedmično prisustvo i zatim napravi grafikon iz A2:B6.',true]
+];
+function mixedName(m,i){const names=['Ukupni bodovi ekipe','Prosjek ocjena grupe','Najveća dnevna posjeta','Najmanji trošak izleta','Brojanje važećih ocjena','Dan iz datuma događaja','Mjesec školskog događaja','Godina iz datuma takmičenja','Dan u sedmici za izlet','Abecedni red gradova','Ukupni troškovi izleta','Prosječno prisustvo učenika','Najveća količina materijala','Najmanja količina materijala','Broj dana sa aktivnošću','Ukupna prodaja proizvoda','Rastući poredak brojeva','Današnji datum u evidenciji','Prosjek rezultata testa','Prisustvo i grafikon sedmice'];return names[i]||`Izazov ${i+1}`}
+function makeMixedLevels(){return mixed.map((m,i)=>({icon:'🧩',mode:'Miješano',chapter:'Završni izazovi',name:mixedName(m,i),concept:'U završnim zadacima samostalno biraš formulu, ćeliju, raspon i po potrebi grafikon ili formatiranje.',task:m[4],setup:()=>setupFormula(m[0],[m[1],m[2],m[3]]),target:m[2],expectFormula:expectedFormula(m[0],m[1]),needChart:!!m[5],needSelection:m[5]?'A2:B6':undefined}))}
+const levels=[...baseLevels,...makeFormulaLevels(),...makeMixedLevels()];
+function setupSelect(){const s=document.getElementById('levelSelect');s.innerHTML='';levels.forEach((L,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`Nivo ${i+1}: ${L.name}`;s.appendChild(o)})}
+function renderTemplates(){const grid=document.getElementById('templateGrid');grid.innerHTML='';Object.entries(templates).forEach(([k,t])=>{const card=document.createElement('div');card.className='template-card '+(chosenTemplate===k?'active':'');card.innerHTML=`<b>${t.name}</b><span>${t.desc}</span>`;card.onclick=()=>loadTemplate(k);grid.appendChild(card)})}
+function helpItems(L){let arr=['Klikni ćeliju da je odabereš. Dvoklik omogućava direktan upis u ćeliju.','Formulu možeš početi kucati, pa prevući raspon da se sam doda u zagradu.'];if(L.mode==='Format')arr.push('Format mijenja prikaz podatka, ne mora mijenjati samu vrijednost.');if(L.mode==='Grafikoni')arr.push('Za grafikon prvo označi raspon prevlačenjem preko ćelija.');if(L.mode==='Funkcije'||L.mode==='Miješano')arr.push('Formula počinje znakom = i najčešće koristi raspon, npr. B2:B6.');return arr.map(x=>`<div class="help-item"><b>• ${x}</b></div>`).join('')}
+function applySetup(L){blankCells();chosenTemplate=null;hideChart();selection=[];active='A1';formulaTarget='A1';formulaPickMode=false;editingCell=null;editingInput=null;formulaPickBase='';formulaInput.value='';if(L.setup==='blank'){}else if(typeof L.setup==='function')L.setup();else if(!L.setup&&L.mode==='Predlošci'){}selectCell(L.target||'A1')}
+function renderAll(){const L=levels[currentLevel];document.getElementById('levelIndicator').textContent=`Nivo ${currentLevel+1} / ${levels.length}`;document.getElementById('modeIndicator').textContent=L.mode;document.getElementById('chapterBadge').textContent=L.chapter;document.getElementById('taskTitle').textContent=L.name;document.getElementById('taskText').textContent=L.task;document.getElementById('conceptText').textContent=L.concept;document.getElementById('helpList').innerHTML=helpItems(L);document.getElementById('templatePanel').style.display=L.mode==='Predlošci'?'block':'none';document.getElementById('levelSelect').value=currentLevel;document.getElementById('nextBtn').disabled=!completed[currentLevel];renderTemplates();renderSheet()}
+function jumpToLevel(){currentLevel=Number(document.getElementById('levelSelect').value);resetLevel()}
+function resetLevel(){document.getElementById('feedback').className='feedback';applySetup(levels[currentLevel]);renderAll()}
+function nextLevel(){if(currentLevel<levels.length-1){currentLevel++;resetLevel()}else showOverlay('Završeno!','Prešao/prešla si sve nivoe tabelarne obrade podataka.')}
+function almost(a,b){if(Array.isArray(a)||Array.isArray(b))return JSON.stringify(a)==JSON.stringify(b);if(!Number.isNaN(Number(a))&&!Number.isNaN(Number(b)))return Math.abs(Number(a)-Number(b))<0.001;return String(a).trim()===String(b).trim()}
+function checkLevel(){const L=levels[currentLevel];let ok=true,msg='Bravo, tačno je.';if(L.needTemplate){ok=chosenTemplate===L.needTemplate;msg=ok?'Tačno, otvorio/otvorila si pravi predložak.':'Nije taj predložak. Pogledaj naziv koji se traži u zadatku.'}
+if(ok&&L.expectValue!==undefined){ok=almost(getCell(L.target),L.expectValue);msg=ok?'Tačno, ćelija ima traženi sadržaj.':`Provjeri ćeliju ${L.target}.`}
+if(ok&&L.expectFmt){ok=cells[L.target].fmt===L.expectFmt;msg=ok?'Tačno, format je dobro postavljen.':`Ćelija ${L.target} još nema traženi format.`}
+if(ok&&L.expectDec!==undefined){ok=cells[L.target].dec===L.expectDec;msg=ok?'Tačno, decimalna mjesta su dobro podešena.':'Podesi tačno 2 decimalna mjesta.'}
+if(ok&&L.expectFormula){ok=normFormula(cells[L.target].formula)===normFormula(L.expectFormula);if(!ok){msg=`Formula u ${L.target} nije dobra. Treba koristiti ${L.expectFormula}.`}else{let res=evalFormula(cells[L.target].formula);if(Array.isArray(res)){const p=parseAddr(L.target);ok=res.every((v,i)=>almost(getCell(addr(p.c,p.r+i)),v));msg=ok?'Tačno, formula je unesena i rezultat je ispravan.':'Formula je tu, ali rezultat nije prosut kako treba.'}else msg='Tačno, formula je unesena i rezultat je ispravan.'}}
+if(ok&&L.needSelection&&!L.needChart){const req=rangeAddrs(L.needSelection).sort().join(',');ok=selection.slice().sort().join(',')===req;msg=ok?msg:'Označi tačan raspon ćelija naveden u zadatku.'}
+if(ok&&L.needChart){ok=chartInserted;msg=ok?msg:'Još treba ubaciti grafikon iz označenog raspona.'}
+if(ok){completed[currentLevel]=true;document.getElementById('nextBtn').disabled=false;flash(msg,'ok');showOverlay('Bravo!',msg+' Prelazim na sljedeći nivo.');setTimeout(()=>{closeOverlay();nextLevel()},850)}else{flash(msg+' Nivo se vraća na početak.','no');setTimeout(()=>resetLevel(),900)}}
+
+
+/* ===== DORADA v5: nove mehanike, ljepši grafikon, lančani zadaci ===== */
+let colWidths=Array(COLS).fill(110), rowHeights=Array(ROWS).fill(42);
+function ensureToolbarV5(){
+  const tb=document.querySelector('.toolbar');
+  if(!tb || document.getElementById('italicBtn'))return;
+  const after=document.querySelector('.tool-btn[onclick="toggleBold()"]');
+  const ib=document.createElement('button');ib.className='tool-btn mini';ib.id='italicBtn';ib.textContent='I';ib.style.fontStyle='italic';ib.onclick=toggleItalic;after.after(ib);
+  const red=document.createElement('button');red.className='tool-btn mini';red.textContent='Crvena';red.onclick=()=>setFill('red');
+  const blueBtn=[...tb.querySelectorAll('button')].find(b=>b.textContent==='Plava'); if(blueBtn)blueBtn.after(red);
+  // V6: dugmad za dimenzije su uklonjena; veličina se mijenja povlačenjem granica kao u Google Sheets.
+}
+function toggleItalic(){selectionOrActive().forEach(a=>cells[a].italic=!cells[a].italic);renderSheet()}
+function resizeCol(delta){const p=parseAddr(active);if(!p)return;colWidths[p.c]=Math.max(58,Math.min(190,colWidths[p.c]+delta*22));renderSheet();flash(delta>0?'Kolona je proširena.':'Kolona je sužena.','ok')}
+function resizeRow(delta){const p=parseAddr(active);if(!p)return;rowHeights[p.r-1]=Math.max(24,Math.min(88,rowHeights[p.r-1]+delta*10));renderSheet();flash(delta>0?'Red je povišen.':'Red je snižen.','ok')}
+const originalSetCellV5=setCell;
+setCell=function(a,v,extra={}){originalSetCellV5(a,v,extra); if(cells[a] && extra.italic!==undefined)cells[a].italic=extra.italic;}
+const oldBlankCellsV5=blankCells;
+blankCells=function(){oldBlankCellsV5(); colWidths=Array(COLS).fill(110); rowHeights=Array(ROWS).fill(42);}
+
+let resizeState=null, resizeTip=null;
+function showResizeTip(text,x,y){
+  if(!resizeTip){resizeTip=document.createElement('div');resizeTip.className='resize-guide';document.body.appendChild(resizeTip)}
+  resizeTip.textContent=text;resizeTip.style.left=(x+12)+'px';resizeTip.style.top=(y+12)+'px';
+}
+function hideResizeTip(){if(resizeTip){resizeTip.remove();resizeTip=null}}
+function startResizeCol(ev,c){
+  ev.preventDefault();ev.stopPropagation();
+  resizeState={type:'col',index:c,startX:ev.clientX,startY:ev.clientY,startSize:colWidths[c]};
+  document.body.classList.add('resizing-sheet');
+  showResizeTip(colWidths[c]+' px',ev.clientX,ev.clientY);
+}
+function startResizeRow(ev,r){
+  ev.preventDefault();ev.stopPropagation();
+  resizeState={type:'row',index:r,startX:ev.clientX,startY:ev.clientY,startSize:rowHeights[r]};
+  document.body.classList.add('resizing-sheet');
+  showResizeTip(rowHeights[r]+' px',ev.clientX,ev.clientY);
+}
+document.addEventListener('mousemove',ev=>{
+  if(!resizeState)return;
+  if(resizeState.type==='col'){
+    const w=Math.max(62,Math.min(260,resizeState.startSize+(ev.clientX-resizeState.startX)));
+    colWidths[resizeState.index]=w;
+    showResizeTip(Math.round(w)+' px',ev.clientX,ev.clientY);
+  }else{
+    const h=Math.max(26,Math.min(110,resizeState.startSize+(ev.clientY-resizeState.startY)));
+    rowHeights[resizeState.index]=h;
+    showResizeTip(Math.round(h)+' px',ev.clientX,ev.clientY);
+  }
+  renderSheet();
+});
+document.addEventListener('mouseup',()=>{
+  if(!resizeState)return;
+  const type=resizeState.type; resizeState=null;
+  document.body.classList.remove('resizing-sheet');hideResizeTip();
+  flash(type==='col'?'Širina kolone je promijenjena povlačenjem granice.':'Visina reda je promijenjena povlačenjem granice.','ok');
+});
+
+renderSheet=function(){
+  sheet.innerHTML='';
+  sheet.style.gridTemplateColumns='44px '+colWidths.map(w=>w+'px').join(' ');
+  sheet.style.gridAutoRows='unset';
+  const corner=document.createElement('div');corner.className='corner';corner.style.height='34px';sheet.appendChild(corner);
+  letters.forEach((l,i)=>{
+    const e=document.createElement('div');
+    e.className='col-head'+(colWidths[i]!==110?' resized':'');
+    e.textContent=l; e.style.height='34px';
+    const h=document.createElement('span'); h.className='col-resizer'; h.title='Povuci za promjenu širine kolone';
+    h.onmousedown=(ev)=>startResizeCol(ev,i);
+    e.appendChild(h); sheet.appendChild(e);
+  });
+  for(let r=1;r<=ROWS;r++){
+    const rh=document.createElement('div');rh.className='row-head'+(rowHeights[r-1]!==42?' resized':'');rh.textContent=r;rh.style.height=rowHeights[r-1]+'px';
+    const hr=document.createElement('span');hr.className='row-resizer';hr.title='Povuci za promjenu visine reda';hr.onmousedown=(ev)=>startResizeRow(ev,r-1);rh.appendChild(hr);sheet.appendChild(rh);
+    for(let c=0;c<COLS;c++){
+      const a=addr(c,r),data=cells[a];
+      const el=document.createElement('div');el.className='cell';el.dataset.addr=a;el.textContent=displayCell(a);el.style.height=rowHeights[r-1]+'px';
+      if(a===active)el.classList.add('active');
+      if(selection.includes(a))el.classList.add('selected');
+      if(data.bold)el.classList.add('bold');
+      if(data.italic)el.classList.add('italic');
+      if(data.fmt==='date')el.classList.add('fmt-date');
+      if(data.fmt==='currency')el.classList.add('fmt-currency');
+      if(data.fmt==='percent')el.classList.add('fmt-percent');
+      if(data.fill)el.classList.add('fill-'+data.fill);
+      if(targetAddrsForLevel().includes(a))el.classList.add('target');
+      el.onmousedown=(ev)=>{
+        if(ev.detail>=2){ev.preventDefault();ev.stopPropagation();dragging=false;return;}
+        if(editingInput&&document.body.contains(editingInput)&&!isFormulaPicking()){return;}
+        dragging=true;dragStart=a;selection=[a];
+        if(isFormulaPicking()){formulaPickBase='';previewRangeInFormula();updateSelectionClasses();return;}
+        selectCell(a);renderSheet();
+      };
+      el.onmouseenter=()=>{if(dragging&&dragStart){selection=makeRect(dragStart,a);if(isFormulaPicking()){previewRangeInFormula();updateSelectionClasses()}else renderSheet()}};
+      el.onmouseup=()=>{if(isFormulaPicking()){finishRangePick()} dragging=false;};
+      el.ondblclick=(ev)=>{ev.preventDefault();ev.stopPropagation();dragging=false;editCellInline(a)};
+      sheet.appendChild(el);
+    }
+  }
+}
+const oldSelectCellV5=selectCell;
+selectCell=function(a){oldSelectCellV5(a); if(cells[a])document.getElementById('formatSelect').value=cells[a].fmt||'automatic'}
+function safeNumberForFormula(v){const n=Number(String(v).replace(',','.'));return Number.isFinite(n)?n:0}
+const oldEvalFormulaV5=evalFormula;
+evalFormula=function(f){
+  let s=String(f).trim();
+  if(!s.startsWith('='))return s;
+  const first=oldEvalFormulaV5(f);
+  if(first!=='#GREŠKA')return first;
+  let expr=s.slice(1).toUpperCase().replace(/([A-L]\d{1,2})/g,(m)=>String(safeNumberForFormula(getCell(m))));
+  if(!/^[0-9+\-*/().,\s]+$/.test(expr))return '#GREŠKA';
+  try{const val=Function('"use strict";return ('+expr.replace(/,/g,'.')+')')();return Number.isFinite(val)?Math.round(val*1000)/1000:'#GREŠKA'}catch(e){return '#GREŠKA'}
+}
+function makeChartDraggable(){
+  const box=document.getElementById('chartBox'), head=document.getElementById('chartTitle'); if(!box||!head||box.dataset.dragReady)return; box.dataset.dragReady='1';
+  let down=false,dx=0,dy=0;
+  head.addEventListener('mousedown',e=>{down=true;const r=box.getBoundingClientRect();box.style.left=r.left+'px';box.style.top=r.top+'px';box.style.right='auto';box.style.bottom='auto';dx=e.clientX-r.left;dy=e.clientY-r.top;e.preventDefault();});
+  window.addEventListener('mousemove',e=>{if(!down)return;box.style.left=Math.max(8,Math.min(window.innerWidth-80,e.clientX-dx))+'px';box.style.top=Math.max(76,Math.min(window.innerHeight-80,e.clientY-dy))+'px';});
+  window.addEventListener('mouseup',()=>down=false);
+}
+insertChart=function(){
+  const rng=selection.length?selection:rangeAddrs('A2:B6');
+  const pairs=[];let rows={};
+  rng.forEach(a=>{const p=parseAddr(a);if(!p)return;rows[p.r]=rows[p.r]||{};rows[p.r][p.c]=getCell(a)});
+  Object.keys(rows).map(Number).sort((a,b)=>a-b).forEach(r=>{let row=rows[r];let keys=Object.keys(row).map(Number).sort((a,b)=>a-b);let vals=keys.map(k=>row[k]);if(vals.length>=2&&!Number.isNaN(Number(String(vals[1]).replace(',','.'))))pairs.push([vals[0],Number(String(vals[1]).replace(',','.'))])});
+  if(!pairs.length){flash('Odaberi raspon sa nazivima i brojevima, npr. A2:B6, pa ubaci grafikon.','no');return}
+  chartInserted=true;chartRange=rangeTextFromSelection();
+  const box=document.getElementById('chartBox');box.classList.add('show');box.style.left='';box.style.top='';box.style.right='22px';box.style.bottom='18px';
+  document.getElementById('chartTitle').textContent='Grafikon: '+(chartRange||'odabrani raspon');
+  const max=Math.max(...pairs.map(p=>p[1]));const bars=document.getElementById('chartBars');bars.innerHTML='';
+  pairs.slice(0,9).forEach(([lab,val])=>{const b=document.createElement('div');b.className='bar';b.style.height=Math.max(10,Math.round((val/max)*82))+'px';b.title=lab+': '+val;const vv=document.createElement('em');vv.className='value-label';vv.textContent=val;const s=document.createElement('span');s.textContent=String(lab).slice(0,10);b.appendChild(vv);b.appendChild(s);bars.appendChild(b)});
+  makeChartDraggable();flash('Grafikon je ubačen. Možeš ga pomjeriti povlačenjem naslova grafikona.','ok')
+}
+
+/* v9: stabilno pomjeranje grafikona i tortni grafikon */
+makeChartDraggable=function(){
+  const box=document.getElementById('chartBox'), head=document.getElementById('chartTitle');
+  if(!box||!head||box.dataset.dragReadyV9)return;
+  box.dataset.dragReadyV9='1';
+  let down=false,dx=0,dy=0,parentRect=null;
+  head.addEventListener('mousedown',e=>{
+    down=true;
+    const parent=box.offsetParent || box.parentElement;
+    parentRect=parent.getBoundingClientRect();
+    const r=box.getBoundingClientRect();
+    const left=r.left-parentRect.left;
+    const top=r.top-parentRect.top;
+    box.style.left=left+'px';
+    box.style.top=top+'px';
+    box.style.right='auto';
+    box.style.bottom='auto';
+    dx=e.clientX-r.left;
+    dy=e.clientY-r.top;
+    document.body.classList.add('dragging-chart');
+    e.preventDefault();e.stopPropagation();
+  });
+  window.addEventListener('mousemove',e=>{
+    if(!down)return;
+    const parent=box.offsetParent || box.parentElement;
+    parentRect=parentRect || parent.getBoundingClientRect();
+    const maxLeft=Math.max(8,parent.clientWidth-box.offsetWidth-8);
+    const maxTop=Math.max(8,parent.clientHeight-box.offsetHeight-8);
+    const left=Math.max(8,Math.min(maxLeft,e.clientX-parentRect.left-dx));
+    const top=Math.max(8,Math.min(maxTop,e.clientY-parentRect.top-dy));
+    box.style.left=left+'px';
+    box.style.top=top+'px';
+  });
+  window.addEventListener('mouseup',()=>{if(down){down=false;document.body.classList.remove('dragging-chart');parentRect=null;}});
+};
+function chartPairsFromSelection(){
+  const rng=selection.length?selection:rangeAddrs('A2:B6');
+  const pairs=[];let rows={};
+  rng.forEach(a=>{const p=parseAddr(a);if(!p)return;rows[p.r]=rows[p.r]||{};rows[p.r][p.c]=getCell(a)});
+  Object.keys(rows).map(Number).sort((a,b)=>a-b).forEach(r=>{
+    let row=rows[r];let keys=Object.keys(row).map(Number).sort((a,b)=>a-b);let vals=keys.map(k=>row[k]);
+    if(vals.length>=2&&!Number.isNaN(Number(String(vals[1]).replace(',','.'))))pairs.push([vals[0],Number(String(vals[1]).replace(',','.'))]);
+  });
+  return pairs;
+}
+function placeChartBox(){
+  const box=document.getElementById('chartBox');
+  box.classList.add('show');box.style.left='';box.style.top='';box.style.right='22px';box.style.bottom='18px';
+  makeChartDraggable();
+  return box;
+}
+insertChart=function(){
+  const pairs=chartPairsFromSelection();
+  if(!pairs.length){flash('Odaberi raspon sa nazivima i brojevima, npr. A2:B6, pa ubaci stupčasti grafikon.','no');return}
+  chartInserted=true;chartRange=rangeTextFromSelection();placeChartBox();
+  document.getElementById('chartTitle').textContent='Stupčasti grafikon: '+(chartRange||'odabrani raspon');
+  const max=Math.max(...pairs.map(p=>p[1]));const bars=document.getElementById('chartBars');bars.className='chart-bars';bars.innerHTML='';
+  pairs.slice(0,9).forEach(([lab,val])=>{const b=document.createElement('div');b.className='bar';b.style.height=Math.max(12,Math.round((val/max)*76))+'px';b.title=lab+': '+val;const vv=document.createElement('em');vv.className='value-label';vv.textContent=val;const s=document.createElement('span');s.textContent=String(lab).slice(0,10);b.appendChild(vv);b.appendChild(s);bars.appendChild(b)});
+  flash('Ubačen je stupčasti grafikon. Pomjeraš ga povlačenjem naslova grafikona.','ok')
+};
+function insertPieChart(){
+  const pairs=chartPairsFromSelection();
+  if(!pairs.length){flash('Odaberi raspon sa nazivima i brojevima, npr. A2:B5, pa ubaci tortni grafikon.','no');return}
+  chartInserted=true;chartRange=rangeTextFromSelection();placeChartBox();
+  document.getElementById('chartTitle').textContent='Tortni grafikon: '+(chartRange||'odabrani raspon');
+  const total=pairs.reduce((s,p)=>s+p[1],0)||1;
+  const colors=['#60a5fa','#22c55e','#f97316','#a78bfa','#facc15','#ef4444','#14b8a6','#94a3b8'];
+  let start=0,parts=[];
+  pairs.slice(0,8).forEach((p,i)=>{const deg=p[1]/total*360;parts.push(`${colors[i]} ${start}deg ${start+deg}deg`);start+=deg;});
+  const bars=document.getElementById('chartBars');bars.className='pie-wrap';
+  bars.innerHTML=`<div class="pie" style="background:conic-gradient(${parts.join(',')})"></div><div class="pie-legend"></div>`;
+  const legend=bars.querySelector('.pie-legend');
+  pairs.slice(0,8).forEach(([lab,val],i)=>{const pct=Math.round(val/total*100);const item=document.createElement('div');item.className='pie-item';item.innerHTML=`<span class="pie-swatch" style="background:${colors[i]}"></span><span class="pie-label">${String(lab).slice(0,18)} — ${pct}%</span>`;legend.appendChild(item)});
+  flash('Ubačen je tortni grafikon. Pomjeraš ga povlačenjem naslova grafikona.','ok')
+}
+
+function setHeaders(headers){headers.forEach((h,i)=>setCell(addr(i,1),h,{bold:true,fill:'blue'}));}
+function setColumn(startAddr,vals){const p=parseAddr(startAddr);vals.forEach((v,i)=>setCell(addr(p.c,p.r+i),v));}
+function checkRangeValues(start,expected){const p=parseAddr(start);return expected.every((v,i)=>almost(getCell(addr(p.c,p.r+i)),v));}
+function applyChainSetup(type){
+  if(type==='heritage'){setHeaders(['Lokalitet','Posjeta','Cijena','Prihod']);[['Baščaršija',28,4],['Stari most',35,5],['Tvrđava Vranduk',16,3],['Stećci Radimlja',21,4]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));}
+  if(type==='subjects'){setHeaders(['Predmet','Ocjena']);[['Matematika',5],['Fizika',4],['Informatika',5],['Historija',4],['Bosanski jezik',5]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));}
+  if(type==='football'){setHeaders(['Igrač','Golovi','Asistencije','Bodovi']);[['Džeko',3,1],['Demirović',2,2],['Pjanić',1,3],['Kolašinac',1,1]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));}
+  if(type==='handball'){setHeaders(['Igrač','Golovi']);[['Burić',1],['Panić',6],['Ovčina',4],['Perić',5],['Vranješ',3]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));}
+  if(type==='physicsSpeed'){setHeaders(['Put s (m)','Vrijeme t (s)','Brzina v=s/t']);[[120,12],[80,10],[150,15]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));}
+  if(type==='physicsDensity'){setHeaders(['Masa m (g)','Zapremina V (cm³)','Gustina ρ=m/V']);[[270,100],[540,200],[135,50]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));}
+  if(type==='budgetChain'){setHeaders(['Stavka','Cijena','Količina','Ukupno']);[['Prevoz',4,25],['Muzej',3,25],['Sendvič',2,25],['Materijal',1,25]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));}
+  if(type==='dates'){setHeaders(['Događaj','Datum','Dan','Mjesec','Godina']);[['Dan škole','17.05.2026.'],['Izlet','09.06.2026.'],['Turnir','25.12.2026.']].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v,{fmt:j===1?'date':'automatic'})));}
+}
+const extraSkillLevels=[
+ {icon:'↔️',mode:'Dimenzije',chapter:'Veličina ćelija',name:'Proširi kolonu za duži naziv',concept:'Kada tekst ne stane u ćeliju, proširi kolonu povlačenjem granice između slova kolona, isto kao u Google Sheets.',task:'Povuci desnu granicu slova A u zaglavlju kolone dok naziv “Stećci Radimlja” bude pregledniji.',setup:()=>{setHeaders(['Lokalitet']);setCell('A2','Stećci Radimlja')},target:'A2',expectCol:{c:0,min:118}},
+ {icon:'↕️',mode:'Dimenzije',chapter:'Veličina ćelija',name:'Povećaj visinu reda',concept:'Red se povećava povlačenjem granice između brojeva redova. Tako dobijaš više prostora po visini.',task:'Povuci donju granicu broja 2 u zaglavlju reda dok red 2 ne bude viši.',setup:()=>{setHeaders(['Napomena']);setCell('A2','Donijeti saglasnost za izlet')},target:'A2',expectRow:{r:2,min:55}},
+ {icon:'↔️',mode:'Dimenzije',chapter:'Veličina ćelija',name:'Smanji preširoku kolonu',concept:'Kolona se može i smanjiti povlačenjem granice ulijevo kada zauzima previše prostora.',task:'Povuci desnu granicu slova B u zaglavlju kolone ulijevo da kolona B bude uža.',setup:()=>{colWidths[1]=150;setHeaders(['Naziv','Broj']);setCell('B2',12)},target:'B2',expectCol:{c:1,max:145}},
+ {icon:'🎨',mode:'Boja',chapter:'Bojenje ćelija',name:'Oboji naslov tabele',concept:'Bojenje ćelija pomaže da se naslov ili važni podaci brže uoče.',task:'Označi A1:C1 i oboji ih zelenom bojom.',setup:()=>{setHeaders(['Predmet','Ocjena','Napomena']);setCell('A2','Informatika');setCell('B2',5)},needSelection:'A1:C1',expectFill:{range:'A1:C1',color:'green'}},
+ {icon:'🎨',mode:'Boja',chapter:'Bojenje ćelija',name:'Označi upozorenje crvenom bojom',concept:'Crvena boja se često koristi za upozorenje ili podatak koji treba provjeriti.',task:'Klikni C2 i oboji ćeliju crvenom bojom.',setup:()=>{setHeaders(['Učenik','Bodovi','Status']);setCell('A2','Emir');setCell('B2',38);setCell('C2','Dopuniti')},target:'C2',expectFill:{range:'C2',color:'red'}},
+ {icon:'B',mode:'Tekst',chapter:'Bold i italic',name:'Podebljaj naziv kolone',concept:'Bold se koristi za isticanje naslova ili važnog teksta.',task:'Klikni A1 i pritisni dugme B da podebljaš tekst.',setup:()=>{setCell('A1','Predmet');setCell('A2','Fizika')},target:'A1',expectBold:true},
+ {icon:'I',mode:'Tekst',chapter:'Bold i italic',name:'Italic za napomenu',concept:'Italic, odnosno ukošeni tekst, često se koristi za napomene i objašnjenja.',task:'Klikni C2 i pritisni dugme I da tekst bude ukošen.',setup:()=>{setHeaders(['Zadatak','Bodovi','Napomena']);setCell('A2','Grafikon');setCell('B2',10);setCell('C2','provjeriti')},target:'C2',expectItalic:true},
+ {icon:'✖️',mode:'Formula',chapter:'Računske formule',name:'Formula sa množenjem',concept:'Formula ne mora uvijek biti funkcija. Može biti običan račun, npr. =B2*2.',task:'U C2 izračunaj duple bodove formulom =B2*2.',setup:()=>{setHeaders(['Učenik','Bodovi','Duplo']);setCell('A2','Amina');setCell('B2',7)},target:'C2',expectFormula:'=B2*2'},
+ {icon:'➖',mode:'Formula',chapter:'Računske formule',name:'Formula sa oduzimanjem',concept:'Ćelije se mogu koristiti kao promjenjive u računu. Ako promijeniš broj u ćeliji, mijenja se i rezultat formule.',task:'U C2 upiši formulu =B2-A2. A2 je plan, B2 je ostvareno.',setup:()=>{setHeaders(['Plan','Ostvareno','Razlika']);setCell('A2',20);setCell('B2',17)},target:'C2',expectFormula:'=B2-A2'},
+ {icon:'⚙️',mode:'Formula',chapter:'Računske formule',name:'Kombinovana formula',concept:'Formula može kombinovati više operacija. Množenje ima prednost nad sabiranjem i oduzimanjem, kao u matematici.',task:'U D2 izračunaj bodove formulom =B2*2-C2.',setup:()=>{setHeaders(['Igrač','Golovi','Greške','Bodovi']);setCell('A2','Džeko');setCell('B2',3);setCell('C2',1)},target:'D2',expectFormula:'=B2*2-C2'}
+];
+const betterMixedLevels=[
+ {icon:'📚',mode:'Miješano',chapter:'Lančani izazovi',name:'Moji predmeti i prosjek ocjena',concept:'Lančani zadatak: prvo unosiš svoje podatke, zatim ih sortiraš i na kraju računaš prosjek.',task:'U A2:A6 upiši 5 školskih predmeta, u B2:B6 ocjene. Zatim označi A2:A6 i sortiraj predmete. U B7 izračunaj prosjek ocjena pomoću =AVERAGE(B2:B6).',setup:()=>{setHeaders(['Predmet','Ocjena']);},target:'B7',expectFormula:'=AVERAGE(B2:B6)',needSortedRange:'A2:A6'},
+ {icon:'🏛️',mode:'Miješano',chapter:'Kulturna baština BiH',name:'Prihod od posjete kulturnim lokalitetima',concept:'Podaci iz kulture mogu se analizirati isto kao sportski ili školski podaci.',task:'Za svaki lokalitet izračunaj prihod: D2 = B2*C2, D3 = B3*C3, D4 = B4*C4, D5 = B5*C5. Zatim u D6 saberi ukupan prihod.',setup:()=>applyChainSetup('heritage'),target:'D6',targets:['D2','D3','D4','D5','D6'],expectFormulas:{D2:'=B2*C2',D3:'=B3*C3',D4:'=B4*C4',D5:'=B5*C5',D6:'=SUM(D2:D5)'}},
+ {icon:'📊',mode:'Miješano',chapter:'Kulturna baština BiH',name:'Grafikon posjeta lokalitetima',concept:'Nakon računanja često pravimo grafikon da podatke brže uporedimo.',task:'Označi A2:B5 i ubaci grafikon posjeta. Zatim pomjeri grafikon malo lijevo ili gore.',setup:()=>applyChainSetup('heritage'),needChart:true,needSelection:'A2:B5'},
+ {icon:'⚽',mode:'Miješano',chapter:'Reprezentacija BiH',name:'Bodovi nogometne reprezentacije',concept:'Jedna formula se može kopirati po redovima, jer svaka vrsta koristi svoje ćelije.',task:'Izračunaj bodove igrača: D2 = B2*2+C2, D3 = B3*2+C3, D4 = B4*2+C4, D5 = B5*2+C5. U D6 pronađi najveći broj bodova funkcijom MAX.',setup:()=>applyChainSetup('football'),target:'D6',expectFormulas:{D2:'=B2*2+C2',D3:'=B3*2+C3',D4:'=B4*2+C4',D5:'=B5*2+C5',D6:'=MAX(D2:D5)'}},
+ {icon:'🤾',mode:'Miješano',chapter:'Reprezentacija BiH',name:'Prosjek golova rukometne ekipe',concept:'AVERAGE se koristi kada želimo prosječnu vrijednost iz niza brojeva.',task:'U B7 izračunaj prosjek golova rukometaša pomoću =AVERAGE(B2:B6), a ćeliju B7 oboji žutom bojom.',setup:()=>applyChainSetup('handball'),target:'B7',expectFormula:'=AVERAGE(B2:B6)',expectFill:{range:'B7',color:'yellow'}},
+ {icon:'🏃',mode:'Miješano',chapter:'Fizika 8. razred',name:'Brzina kretanja v = s / t',concept:'U fizici se brzina računa formulom v = s / t. U tabeli se to može napisati preko adresa ćelija.',task:'U C2, C3 i C4 izračunaj brzinu formulama =A2/B2, =A3/B3, =A4/B4. Zatim C1 podebljaj.',setup:()=>applyChainSetup('physicsSpeed'),target:'C2',expectFormulas:{C2:'=A2/B2',C3:'=A3/B3',C4:'=A4/B4'},expectBoldCell:'C1'},
+ {icon:'⚖️',mode:'Miješano',chapter:'Fizika 8. razred',name:'Gustina tijela ρ = m / V',concept:'Gustina se računa kao masa podijeljena zapreminom. Tabela pomaže da istu formulu primijenimo više puta.',task:'U C2:C4 izračunaj gustinu formulama =A2/B2, =A3/B3, =A4/B4. Zatim C2:C4 formatiraj kao broj sa 2 decimale.',setup:()=>applyChainSetup('physicsDensity'),expectFormulas:{C2:'=A2/B2',C3:'=A3/B3',C4:'=A4/B4'},expectFmtRange:{range:'C2:C4',fmt:'number',dec:2}},
+ {icon:'🚌',mode:'Miješano',chapter:'Izlet',name:'Budžet izleta po učenicima',concept:'Kada cijenu množimo količinom, dobijamo ukupan iznos za jednu stavku.',task:'U D2:D5 izračunaj ukupno po stavkama formulama B*C. U D6 upiši =SUM(D2:D5). Zatim povuci granicu kolone D da je proširiš.',setup:()=>applyChainSetup('budgetChain'),target:'D6',expectFormulas:{D2:'=B2*C2',D3:'=B3*C3',D4:'=B4*C4',D5:'=B5*C5',D6:'=SUM(D2:D5)'},expectCol:{c:3,min:118}},
+ {icon:'📅',mode:'Miješano',chapter:'Datumi',name:'Dan, mjesec i godina događaja',concept:'Iz jednog datuma možemo dobiti više korisnih podataka: dan, mjesec i godinu.',task:'Za datum u B2 upiši C2 =DAY(B2), D2 =MONTH(B2), E2 =YEAR(B2). Ponovi za B3 i B4.',setup:()=>applyChainSetup('dates'),expectFormulas:{C2:'=DAY(B2)',D2:'=MONTH(B2)',E2:'=YEAR(B2)',C3:'=DAY(B3)',D3:'=MONTH(B3)',E3:'=YEAR(B3)',C4:'=DAY(B4)',D4:'=MONTH(B4)',E4:'=YEAR(B4)'}},
+ {icon:'🔤',mode:'Miješano',chapter:'Sortiranje',name:'Abecedni red gradova BiH',concept:'Sortiranje teksta pomaže da se spiskovi brže pronađu i pregledaju.',task:'U A2:A7 upiši gradove BiH po svom izboru, zatim označi A2:A7 i klikni “Sortiraj raspon”.',setup:()=>{setHeaders(['Gradovi BiH']);},needSortedRange:'A2:A7'},
+ {icon:'🎨',mode:'Miješano',chapter:'Uređivanje',name:'Pregledna tabela uspjeha',concept:'Dobra tabela nije samo tačna, nego i pregledna: naslovi, boje i naglašavanje pomažu čitanju.',task:'Napravi da A1:C1 budu bold i plave boje, a B2:B5 formatiraj kao broj.',setup:()=>{setHeaders(['Učenik','Ocjena','Predmet']);[['Amina',5,'Matematika'],['Emir',4,'Fizika'],['Sara',5,'Informatika'],['Mak',3,'Historija']].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)))},expectFill:{range:'A1:C1',color:'blue'},expectBoldRange:'A1:C1',expectFmtRange:{range:'B2:B5',fmt:'number'}},
+ {icon:'📈',mode:'Miješano',chapter:'Grafikon',name:'Ocjene po predmetima i grafikon',concept:'Prvo se podaci unesu i izračunaju, zatim se grafički prikažu.',task:'U A2:A6 upiši predmete, u B2:B6 ocjene. U B7 izračunaj prosjek. Zatim označi A2:B6 i ubaci grafikon.',setup:()=>{setHeaders(['Predmet','Ocjena']);},target:'B7',expectFormula:'=AVERAGE(B2:B6)',needChart:true,needSelection:'A2:B6'},
+ {icon:'🏆',mode:'Miješano',chapter:'Takmičenje',name:'Ukupni rezultat školskog kviza',concept:'Lančano: saberi bodove po kategorijama, pa iz ukupnih rezultata pronađi pobjednika.',task:'U D2:D5 izračunaj =B+C za svaku ekipu. U D6 pronađi najveći rezultat pomoću =MAX(D2:D5).',setup:()=>{setHeaders(['Ekipa','Informatika','Matematika','Ukupno']);[['Zmajevi',18,20],['Ljiljani',20,17],['Una',16,19],['Bosna',19,18]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)))},expectFormulas:{D2:'=B2+C2',D3:'=B3+C3',D4:'=B4+C4',D5:'=B5+C5',D6:'=MAX(D2:D5)'}},
+ {icon:'🏫',mode:'Miješano',chapter:'Škola',name:'Prisustvo i procenat odsutnih',concept:'Jednostavne formule mogu pomoći u evidenciji odjeljenja.',task:'U C2:C6 izračunaj odsutne formulom =25-B2 itd. U C7 izračunaj prosjek odsutnih.',setup:()=>{setHeaders(['Dan','Prisutni','Odsutni']);[['Pon',22],['Uto',20],['Sri',24],['Čet',21],['Pet',23]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)))},expectFormulas:{C2:'=25-B2',C3:'=25-B3',C4:'=25-B4',C5:'=25-B5',C6:'=25-B6',C7:'=AVERAGE(C2:C6)'}},
+ {icon:'🧮',mode:'Miješano',chapter:'Brojevi',name:'Dvostruko manje greške',concept:'Formula može sadržavati i zagrade da se prvo uradi sabiranje ili oduzimanje.',task:'U D2 izračunaj =B2*2-A2. U D3 izračunaj =(B3-C3)*2. Obje formule koriste redoslijed računskih operacija.',setup:()=>{setHeaders(['Greške','Bodovi','Kazna','Rezultat']);setCell('A2',2);setCell('B2',8);setCell('C2',1);setCell('A3',0);setCell('B3',9);setCell('C3',2)},expectFormulas:{D2:'=B2*2-A2',D3:'=(B3-C3)*2'}},
+ {icon:'📦',mode:'Miješano',chapter:'Prodaja',name:'Školski bazar',concept:'Tabele su korisne i za male prodajne evidencije: cijena puta količina daje prihod.',task:'U D2:D5 izračunaj prihod =B*C. U D6 saberi prihode i ubaci grafikon A2:D5.',setup:()=>{setHeaders(['Proizvod','Cijena','Količina','Prihod']);[['Privjesak',3,12],['Naljepnica',1,30],['Sveska',2,18],['Bookmark',1,25]].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)))},expectFormulas:{D2:'=B2*C2',D3:'=B3*C3',D4:'=B4*C4',D5:'=B5*C5',D6:'=SUM(D2:D5)'},needChart:true,needSelection:'A2:D5'},
+ {icon:'📍',mode:'Miješano',chapter:'Lokalna zajednica',name:'Aktivnosti u općini',concept:'Sortiran i formatiran spisak je lakši za čitanje.',task:'U A2:A6 upiši 5 aktivnosti u lokalnoj zajednici, sortiraj ih, povuci granicu kolone A da je proširiš i oboji A1 zeleno.',setup:()=>{setHeaders(['Aktivnosti']);},needSortedRange:'A2:A6',expectCol:{c:0,min:118},expectFill:{range:'A1',color:'green'}},
+ {icon:'🕒',mode:'Miješano',chapter:'Datumi',name:'Evidencija danas',concept:'NOW se koristi kada želimo automatski zabilježiti trenutni datum.',task:'U B2 upiši =NOW(). U A2 upiši “Danas”. Ćeliju B2 formatiraj kao datum.',setup:()=>{setHeaders(['Opis','Datum']);},target:'B2',expectFormula:'=NOW()',expectFmtRange:{range:'B2',fmt:'date'}},
+ {icon:'🧾',mode:'Miješano',chapter:'Završni mini-projekat',name:'Moj mali izvještaj',concept:'Mini-projekat povezuje unos, uređivanje, formule i grafikon.',task:'Unesi 4 stavke po izboru u A2:A5 i brojeve u B2:B5. U B6 izračunaj SUM, u B7 AVERAGE, oboji naslov A1:B1 plavo i ubaci grafikon A2:B5.',setup:()=>{setHeaders(['Stavka','Vrijednost']);},expectFormulas:{B6:'=SUM(B2:B5)',B7:'=AVERAGE(B2:B5)'},expectFill:{range:'A1:B1',color:'blue'},needChart:true,needSelection:'A2:B5'},
+ {icon:'✅',mode:'Miješano',chapter:'Finalni izazov',name:'Sve zajedno: tabela, formula, format i grafikon',concept:'Ovo je završni zadatak: koristiš više vještina zajedno kao u pravoj tabeli.',task:'U A2:A6 upiši nazive po izboru, u B2:B6 brojeve. Sortiraj A2:A6, izračunaj B7 =SUM(B2:B6), B8 =MAX(B2:B6), formatiraj B2:B8 kao broj i ubaci grafikon A2:B6.',setup:()=>{setHeaders(['Naziv','Broj']);},expectFormulas:{B7:'=SUM(B2:B6)',B8:'=MAX(B2:B6)'},needSortedRange:'A2:A6',expectFmtRange:{range:'B2:B8',fmt:'number'},needChart:true,needSelection:'A2:B6'}
+];
+function checkAllFormulas(map){return Object.entries(map).every(([a,f])=>normFormula(cells[a].formula)===normFormula(f) && evalFormula(cells[a].formula)!=='#GREŠKA')}
+function checkAllFill(range,color){return rangeAddrs(range).every(a=>cells[a].fill===color)}
+function checkAllBold(range){return rangeAddrs(range).every(a=>!!cells[a].bold)}
+function checkAllFmt(obj){return rangeAddrs(obj.range).every(a=>cells[a].fmt===obj.fmt && (obj.dec===undefined || cells[a].dec===obj.dec))}
+function isRangeSorted(range){const vals=rangeAddrs(range).map(a=>getCell(a)).filter(v=>String(v).trim()!=='');if(vals.length<2)return false;return vals.every((v,i)=>i===0||String(vals[i-1]).localeCompare(String(v),'bs',{numeric:true})<=0)}
+const oldApplySetupV5=applySetup;
+applySetup=function(L){oldApplySetupV5(L);}
+const oldCheckLevelV5=checkLevel;
+checkLevel=function(){
+  const L=levels[currentLevel];let ok=true,msg='Bravo, tačno je.';
+  if(L.needTemplate){ok=chosenTemplate===L.needTemplate;msg=ok?'Tačno, otvorio/otvorila si pravi predložak.':'Nije taj predložak. Pogledaj naziv koji se traži u zadatku.'}
+  if(ok&&L.expectValue!==undefined){ok=almost(getCell(L.target),L.expectValue);msg=ok?'Tačno, ćelija ima traženi sadržaj.':`Provjeri ćeliju ${L.target}.`}
+  if(ok&&L.expectFmt){ok=cells[L.target].fmt===L.expectFmt;msg=ok?'Tačno, format je dobro postavljen.':`Ćelija ${L.target} još nema traženi format.`}
+  if(ok&&L.expectDec!==undefined){ok=cells[L.target].dec===L.expectDec;msg=ok?'Tačno, decimalna mjesta su dobro podešena.':'Podesi tačno 2 decimalna mjesta.'}
+  if(ok&&L.expectFormula){ok=normFormula(cells[L.target].formula)===normFormula(L.expectFormula);msg=ok?'Tačno, formula je unesena i rezultat je ispravan.':`Formula u ${L.target} nije dobra. Treba koristiti ${L.expectFormula}.`}
+  if(ok&&L.expectFormulas){ok=checkAllFormulas(L.expectFormulas);msg=ok?'Tačno, sve tražene formule su unesene.':'Provjeri sve tražene formule u zadatku.'}
+  if(ok&&L.needSelection&&!L.needChart){const req=rangeAddrs(L.needSelection).sort().join(',');ok=selection.slice().sort().join(',')===req;msg=ok?msg:'Označi tačan raspon ćelija naveden u zadatku.'}
+  if(ok&&L.needSortedRange){ok=isRangeSorted(L.needSortedRange);msg=ok?msg:`Raspon ${L.needSortedRange} još nije sortiran ili nema dovoljno unesenih podataka.`}
+  if(ok&&L.needChart){ok=chartInserted;msg=ok?msg:'Još treba ubaciti grafikon iz označenog raspona.'}
+  if(ok&&L.expectFill){ok=checkAllFill(L.expectFill.range,L.expectFill.color);msg=ok?msg:`Provjeri boju ćelija u rasponu ${L.expectFill.range}.`}
+  if(ok&&L.expectBold){ok=!!cells[L.target].bold;msg=ok?msg:`Ćelija ${L.target} još nije boldirana.`}
+  if(ok&&L.expectItalic){ok=!!cells[L.target].italic;msg=ok?msg:`Ćelija ${L.target} još nije italic.`}
+  if(ok&&L.expectBoldCell){ok=!!cells[L.expectBoldCell].bold;msg=ok?msg:`Ćelija ${L.expectBoldCell} treba biti boldirana.`}
+  if(ok&&L.expectBoldRange){ok=checkAllBold(L.expectBoldRange);msg=ok?msg:`Naslovni raspon ${L.expectBoldRange} treba biti boldiran.`}
+  if(ok&&L.expectFmtRange){ok=checkAllFmt(L.expectFmtRange);msg=ok?msg:`Provjeri format u rasponu ${L.expectFmtRange.range}.`}
+  if(ok&&L.expectCol){const w=colWidths[L.expectCol.c];ok=(L.expectCol.min===undefined||w>=L.expectCol.min)&&(L.expectCol.max===undefined||w<=L.expectCol.max);msg=ok?msg:'Provjeri širinu tražene kolone.'}
+  if(ok&&L.expectRow){const h=rowHeights[L.expectRow.r-1];ok=(L.expectRow.min===undefined||h>=L.expectRow.min)&&(L.expectRow.max===undefined||h<=L.expectRow.max);msg=ok?msg:'Provjeri visinu traženog reda.'}
+  if(ok){completed[currentLevel]=true;document.getElementById('nextBtn').disabled=false;flash(msg,'ok');showOverlay('Bravo!',msg+' Prelazim na sljedeći nivo.');setTimeout(()=>{closeOverlay();nextLevel()},850)}else{flash(msg+' Nivo se vraća na početak.','no');setTimeout(()=>resetLevel(),1050)}
+}
+ensureToolbarV5();
+levels.splice(0,levels.length,...baseLevels.slice(0,baseLevels.length),...extraSkillLevels,...makeFormulaLevels(),...betterMixedLevels);
+
+
+
+// v8: stvarni Sheets način ubacivanja adrese ćelije u formulu.
+// Dok je aktivno uređivanje formule, klik na ćeliju ne mijenja aktivnu ćeliju,
+// nego ubacuje adresu kliknute ćelije u formulu. Povlačenje i dalje ubacuje raspon.
+let formulaPointerDrag=false;
+let formulaPointerStart=null;
+let formulaPointerBase='';
+let formulaPointerSrc=null;
+function currentFormulaSourceV8(){
+  if(editingInput && document.body.contains(editingInput) && String(editingInput.value).trim().startsWith('=')){
+    return {input:editingInput,target:editingCell,type:'cell'};
+  }
+  if(document.activeElement===formulaInput && String(formulaInput.value).trim().startsWith('=')){
+    return {input:formulaInput,target:formulaTarget||active,type:'bar'};
+  }
+  if(String(formulaInput.value).trim().startsWith('=') && formulaPickMode){
+    return {input:formulaInput,target:formulaTarget||active,type:'bar'};
+  }
+  return null;
+}
+function formulaModeV8(v){
+  v=String(v||'').trim();
+  const i=v.lastIndexOf('('), j=v.lastIndexOf(')');
+  if(i>=0 && i>j && /^=[A-Z]+\(/i.test(v.slice(0,i+1)))return 'rangeFunction';
+  return 'reference';
+}
+function formulaInsertBaseV8(input){
+  const v=String(input.value||'');
+  const pos=(typeof input.selectionStart==='number')?input.selectionStart:v.length;
+  const before=v.slice(0,pos), after=v.slice(pos);
+  if(formulaModeV8(v)==='rangeFunction'){
+    const i=before.lastIndexOf('(');
+    return {before:before.slice(0,i+1),after:''};
+  }
+  return {before,after};
+}
+function applyFormulaReferenceV8(src,rng){
+  if(!src||!src.input)return;
+  let next;
+  if(formulaModeV8(formulaPointerBase.before)==='rangeFunction' || /^=[A-Z]+\($/i.test(formulaPointerBase.before)){
+    next=formulaPointerBase.before+rng+')';
+  }else{
+    next=formulaPointerBase.before+rng+formulaPointerBase.after;
+  }
+  src.input.value=next;
+  if(src.type==='cell')formulaInput.value=next;
+  else {formulaTarget=src.target||active;active=formulaTarget;nameBox.textContent=active;}
+  setTimeout(()=>{src.input.focus();try{src.input.setSelectionRange(src.input.value.length,src.input.value.length)}catch(e){}},0);
+}
+function cellFromEventV8(ev){
+  const el=ev.target.closest&&ev.target.closest('.cell');
+  if(!el||!el.dataset||!el.dataset.addr)return null;
+  if(ev.target.classList&&ev.target.classList.contains('cell-editor'))return null;
+  return el.dataset.addr;
+}
+document.addEventListener('mousedown',function(ev){
+  const src=currentFormulaSourceV8(); if(!src)return;
+  // v17: direktna provjera ćelije iz stvarnog klika. Ovo hvata i klik na input,
+  // tekst, prazni dio ili ivicu ćelije koja se trenutno uređuje.
+  const rawCell=(ev.target&&ev.target.closest)?ev.target.closest('.cell'):null;
+  const clicked=rawCell&&rawCell.dataset&&rawCell.dataset.addr?String(rawCell.dataset.addr).toUpperCase():null;
+  const target=src.target?String(src.target).toUpperCase():null;
+  if(clicked && target && clicked===target){
+    ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();
+    formulaPointerDrag=false; formulaPointerStart=null; formulaPointerSrc=null; formulaPickBase='';
+    dragging=false; selection=[target]; active=target; formulaTarget=target; nameBox.textContent=target;
+    updateSelectionClasses();
+    setTimeout(()=>{
+      if(src.input && document.body.contains(src.input)){
+        src.input.focus();
+        try{src.input.setSelectionRange(src.input.value.length,src.input.value.length)}catch(e){}
+      }
+    },0);
+    return;
+  }
+  const a=cellFromEventV8(ev); if(!a)return;
+  ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();
+  formulaPointerDrag=true; formulaPointerStart=a; formulaPointerSrc=src; formulaPointerBase=formulaInsertBaseV8(src.input);
+  selection=[a]; active=src.target||active; formulaTarget=active; nameBox.textContent=active;
+  applyFormulaReferenceV8(src,a); updateSelectionClasses();
+},true);
+document.addEventListener('mouseover',function(ev){
+  if(!formulaPointerDrag||!formulaPointerStart||!formulaPointerSrc)return;
+  const a=cellFromEventV8(ev); if(!a)return;
+  ev.preventDefault();ev.stopPropagation();
+  selection=makeRect(formulaPointerStart,a);
+  const rng=rangeTextFromSelection();
+  applyFormulaReferenceV8(formulaPointerSrc,rng); updateSelectionClasses();
+},true);
+document.addEventListener('mouseup',function(ev){
+  if(!formulaPointerDrag)return;
+  ev.preventDefault();ev.stopPropagation();
+  formulaPointerDrag=false; formulaPointerStart=null; formulaPointerSrc=null; formulaPickBase='';
+},true);
+
+
+
+/* ===== v10: datumske funkcije bez dupliranja, bez automatskog restarta i fill handle ===== */
+function compactDateFunctionLevelsV10(){
+  const keep={DAY:0,MONTH:0,YEAR:0,WEEKDAY:0};
+  for(let i=levels.length-1;i>=0;i--){
+    const L=levels[i];
+    const m=String(L.name||'').match(/^(DAY|MONTH|YEAR|WEEKDAY) primjer/i);
+    if(m){
+      const fn=m[1].toUpperCase();
+      keep[fn]++;
+      if(keep[fn]>1)levels.splice(i,1);
+    }
+  }
+  const dayIndex=levels.findIndex(L=>/^DAY primjer/i.test(String(L.name||'')));
+  const combined={
+    icon:'📅',mode:'Funkcije',chapter:'Funkcije DAY, MONTH, YEAR i WEEKDAY',name:'Datum razdvoji na korisne podatke',
+    concept:'DAY, MONTH, YEAR i WEEKDAY se često koriste zajedno: iz jednog datuma dobijemo dan, mjesec, godinu i broj dana u sedmici.',
+    task:'U B2 je datum. U C2 upiši =DAY(B2), u D2 =MONTH(B2), u E2 =YEAR(B2), a u F2 =WEEKDAY(B2).',
+    setup:()=>{setHeaders(['Događaj','Datum','Dan','Mjesec','Godina','Dan u sedmici']);setCell('A2','Posjeta muzeju');setCell('B2','09.06.2026.',{fmt:'date'});},
+    expectFormulas:{C2:'=DAY(B2)',D2:'=MONTH(B2)',E2:'=YEAR(B2)',F2:'=WEEKDAY(B2)'}
+  };
+  if(!levels.some(L=>L.name===combined.name)){
+    if(dayIndex>=0)levels.splice(dayIndex+4,0,combined); else levels.push(combined);
+  }
+}
+compactDateFunctionLevelsV10();
+
+function shiftFormulaRefsV10(formula, rowDelta, colDelta){
+  return String(formula||'').replace(/(\$?)([A-L])(\$?)(\d{1,2})/g,(m,colAbs,letter,rowAbs,row)=>{
+    let c=letters.indexOf(letter.toUpperCase());
+    let r=Number(row);
+    if(!colAbs)c=Math.max(0,Math.min(COLS-1,c+colDelta));
+    if(!rowAbs)r=Math.max(1,Math.min(ROWS,r+rowDelta));
+    return (colAbs?'$':'')+letters[c]+(rowAbs?'$':'')+r;
+  });
+}
+let fillDragV10=null;
+function startFillHandleV10(ev,a){
+  ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();
+  fillDragV10={start:a,end:a};
+  selection=[a];active=a;formulaTarget=a;document.body.classList.add('dragging-fill');updateSelectionClasses();
+}
+function cellAddrFromEventV10(ev){
+  const el=ev.target.closest&&ev.target.closest('.cell');
+  return el&&el.dataset?el.dataset.addr:null;
+}
+document.addEventListener('mouseover',ev=>{
+  if(!fillDragV10)return;
+  const a=cellAddrFromEventV10(ev); if(!a)return;
+  const s=parseAddr(fillDragV10.start), e=parseAddr(a); if(!s||!e)return;
+  // Fill handle zasad kopira prema dole u istoj koloni, što je najčešći školski primjer.
+  if(e.c!==s.c)return;
+  fillDragV10.end=a;
+  selection=makeRect(fillDragV10.start,a);
+  document.querySelectorAll('.cell.fill-preview').forEach(x=>x.classList.remove('fill-preview'));
+  selection.forEach(x=>{const el=document.querySelector(`.cell[data-addr="${x}"]`);if(el)el.classList.add('fill-preview')});
+},true);
+document.addEventListener('mouseup',ev=>{
+  if(!fillDragV10)return;
+  ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();
+  const start=parseAddr(fillDragV10.start), end=parseAddr(fillDragV10.end);
+  document.body.classList.remove('dragging-fill');
+  document.querySelectorAll('.cell.fill-preview').forEach(x=>x.classList.remove('fill-preview'));
+  if(start&&end&&end.c===start.c&&end.r>start.r){
+    const src=cells[fillDragV10.start];
+    for(let r=start.r+1;r<=end.r;r++){
+      const a=addr(start.c,r);
+      const delta=r-start.r;
+      if(src.formula){
+        const nf=shiftFormulaRefsV10(src.formula,delta,0);
+        const res=evalFormula(nf);
+        setCell(a,res,{formula:nf,fmt:src.fmt,dec:src.dec,bold:src.bold,fill:src.fill,italic:src.italic});
+      }else{
+        setCell(a,src.v,{fmt:src.fmt,dec:src.dec,bold:src.bold,fill:src.fill,italic:src.italic});
+      }
+    }
+    flash('Formula je kopirana prema dole i redovi su automatski promijenjeni.','ok');
+  }
+  fillDragV10=null;
+  renderSheet();
+},true);
+
+// Render sa tačkom u donjem desnom uglu aktivne ćelije.
+renderSheet=function(){
+  sheet.innerHTML='';
+  sheet.style.gridTemplateColumns='44px '+colWidths.map(w=>w+'px').join(' ');
+  sheet.style.gridAutoRows='unset';
+  const corner=document.createElement('div');corner.className='corner';corner.style.height='34px';sheet.appendChild(corner);
+  letters.forEach((l,i)=>{
+    const e=document.createElement('div');e.className='col-head'+(colWidths[i]!==110?' resized':'');e.textContent=l;e.style.height='34px';
+    const h=document.createElement('span');h.className='col-resizer';h.title='Povuci za promjenu širine kolone';h.onmousedown=(ev)=>startResizeCol(ev,i);
+    e.appendChild(h);sheet.appendChild(e);
+  });
+  for(let r=1;r<=ROWS;r++){
+    const rh=document.createElement('div');rh.className='row-head'+(rowHeights[r-1]!==42?' resized':'');rh.textContent=r;rh.style.height=rowHeights[r-1]+'px';
+    const hr=document.createElement('span');hr.className='row-resizer';hr.title='Povuci za promjenu visine reda';hr.onmousedown=(ev)=>startResizeRow(ev,r-1);rh.appendChild(hr);sheet.appendChild(rh);
+    for(let c=0;c<COLS;c++){
+      const a=addr(c,r),data=cells[a];
+      const el=document.createElement('div');el.className='cell';el.dataset.addr=a;el.textContent=displayCell(a);el.style.height=rowHeights[r-1]+'px';
+      if(a===active)el.classList.add('active');
+      if(selection.includes(a))el.classList.add('selected');
+      if(data.bold)el.classList.add('bold');
+      if(data.italic)el.classList.add('italic');
+      if(data.fmt==='date')el.classList.add('fmt-date');
+      if(data.fmt==='currency')el.classList.add('fmt-currency');
+      if(data.fmt==='percent')el.classList.add('fmt-percent');
+      if(data.fill)el.classList.add('fill-'+data.fill);
+      if(targetAddrsForLevel().includes(a))el.classList.add('target');
+      if(a===active && !editingInput){
+        const fh=document.createElement('span');fh.className='fill-handle';fh.title='Povuci prema dole za kopiranje formule';fh.onmousedown=(ev)=>startFillHandleV10(ev,a);el.appendChild(fh);
+      }
+      el.onmousedown=(ev)=>{
+        if(ev.target.classList&&ev.target.classList.contains('fill-handle'))return;
+        if(ev.detail>=2){ev.preventDefault();ev.stopPropagation();dragging=false;return;}
+        if(editingInput&&document.body.contains(editingInput)&&!isFormulaPicking()){return;}
+        dragging=true;dragStart=a;selection=[a];
+        if(isFormulaPicking()){formulaPickBase='';previewRangeInFormula();updateSelectionClasses();return;}
+        selectCell(a);renderSheet();
+      };
+      el.onmouseenter=()=>{if(dragging&&dragStart){selection=makeRect(dragStart,a);if(isFormulaPicking()){previewRangeInFormula();updateSelectionClasses()}else renderSheet()}};
+      el.onmouseup=()=>{if(isFormulaPicking()){finishRangePick()} dragging=false;};
+      el.ondblclick=(ev)=>{ev.preventDefault();ev.stopPropagation();dragging=false;editCellInline(a)};
+      sheet.appendChild(el);
+    }
+  }
+}
+
+// Provjera: ako nije tačno, ne restartuje automatski. Učenik sam klikne “Vrati nivo”.
+checkLevel=function(){
+  const L=levels[currentLevel];let ok=true,msg='Bravo, tačno je.';
+  if(L.needTemplate){ok=chosenTemplate===L.needTemplate;msg=ok?'Tačno, otvorio/otvorila si pravi predložak.':'Nije taj predložak. Pogledaj naziv koji se traži u zadatku.'}
+  if(ok&&L.expectValue!==undefined){ok=almost(getCell(L.target),L.expectValue);msg=ok?'Tačno, ćelija ima traženi sadržaj.':`Provjeri ćeliju ${L.target}.`}
+  if(ok&&L.expectFmt){ok=cells[L.target].fmt===L.expectFmt;msg=ok?'Tačno, format je dobro postavljen.':`Ćelija ${L.target} još nema traženi format.`}
+  if(ok&&L.expectDec!==undefined){ok=cells[L.target].dec===L.expectDec;msg=ok?'Tačno, decimalna mjesta su dobro podešena.':'Podesi tačno 2 decimalna mjesta.'}
+  if(ok&&L.expectFormula){ok=normFormula(cells[L.target].formula)===normFormula(L.expectFormula);msg=ok?'Tačno, formula je unesena i rezultat je ispravan.':`Formula u ${L.target} nije dobra. Treba koristiti ${L.expectFormula}.`}
+  if(ok&&L.expectFormulas){ok=checkAllFormulas(L.expectFormulas);msg=ok?'Tačno, sve tražene formule su unesene.':'Provjeri sve tražene formule u zadatku.'}
+  if(ok&&L.needSelection&&!L.needChart){const req=rangeAddrs(L.needSelection).sort().join(',');ok=selection.slice().sort().join(',')===req;msg=ok?msg:'Označi tačan raspon ćelija naveden u zadatku.'}
+  if(ok&&L.needSortedRange){ok=isRangeSorted(L.needSortedRange);msg=ok?msg:`Raspon ${L.needSortedRange} još nije sortiran ili nema dovoljno unesenih podataka.`}
+  if(ok&&L.needChart){ok=chartInserted;msg=ok?msg:'Još treba ubaciti grafikon iz označenog raspona.'}
+  if(ok&&L.expectFill){ok=checkAllFill(L.expectFill.range,L.expectFill.color);msg=ok?msg:`Provjeri boju ćelija u rasponu ${L.expectFill.range}.`}
+  if(ok&&L.expectBold){ok=!!cells[L.target].bold;msg=ok?msg:`Ćelija ${L.target} još nije boldirana.`}
+  if(ok&&L.expectItalic){ok=!!cells[L.target].italic;msg=ok?msg:`Ćelija ${L.target} još nije italic.`}
+  if(ok&&L.expectBoldCell){ok=!!cells[L.expectBoldCell].bold;msg=ok?msg:`Ćelija ${L.expectBoldCell} treba biti boldirana.`}
+  if(ok&&L.expectBoldRange){ok=checkAllBold(L.expectBoldRange);msg=ok?msg:`Naslovni raspon ${L.expectBoldRange} treba biti boldiran.`}
+  if(ok&&L.expectFmtRange){ok=checkAllFmt(L.expectFmtRange);msg=ok?msg:`Provjeri format u rasponu ${L.expectFmtRange.range}.`}
+  if(ok&&L.expectCol){const w=colWidths[L.expectCol.c];ok=(L.expectCol.min===undefined||w>=L.expectCol.min)&&(L.expectCol.max===undefined||w<=L.expectCol.max);msg=ok?msg:'Provjeri širinu tražene kolone.'}
+  if(ok&&L.expectRow){const h=rowHeights[L.expectRow.r-1];ok=(L.expectRow.min===undefined||h>=L.expectRow.min)&&(L.expectRow.max===undefined||h<=L.expectRow.max);msg=ok?msg:'Provjeri visinu traženog reda.'}
+  if(ok){completed[currentLevel]=true;document.getElementById('nextBtn').disabled=false;flash(msg,'ok');showOverlay('Bravo!',msg+' Prelazim na sljedeći nivo.');setTimeout(()=>{closeOverlay();nextLevel()},850)}
+  else{flash(msg+' Ispravi zadatak ili klikni “Vrati nivo” ako želiš početi ponovo.','no')}
+}
+
+
+
+/* ===== v11: automatske širine gdje tekst ne treba biti sakriven + veliki završni zadaci ===== */
+function autoFitVisibleContentV11(L){
+  if(!L || L.mode==='Dimenzije' || L.expectCol || L.expectRow || L.noAutoFit)return;
+  const minW=110, maxW=210;
+  const wanted=Array(COLS).fill(minW);
+  Object.entries(cells).forEach(([a,d])=>{
+    const p=parseAddr(a); if(!p)return;
+    const raw=(d.formula && d.formula.trim()) ? d.formula : (d.v===undefined||d.v===null?'':String(d.v));
+    if(!raw)return;
+    const len=String(raw).length;
+    let w=Math.min(maxW,Math.max(minW,48+len*8));
+    if(p.r===1)w=Math.min(maxW,Math.max(w,62+len*8));
+    wanted[p.c]=Math.max(wanted[p.c],w);
+  });
+  // Daj malo prostora kolonama u kojima učenik treba upisivati formule ili duže rezultate.
+  targetAddrsForLevel(L).forEach(a=>{const p=parseAddr(a); if(p)wanted[p.c]=Math.max(wanted[p.c],138)});
+  colWidths=wanted;
+  rowHeights=Array(ROWS).fill(42);
+  // Naslovni red neka bude malo viši ako ima duže naslove, ali samo kad nije lekcija o visini reda.
+  const headerLong=Object.entries(cells).some(([a,d])=>{const p=parseAddr(a);return p&&p.r===1&&String(d.v||'').length>12});
+  if(headerLong)rowHeights[0]=46;
+}
+
+const oldApplySetupV11=applySetup;
+applySetup=function(L){oldApplySetupV11(L);autoFitVisibleContentV11(L);};
+
+function addRichFinalLevelsV11(){
+  const finalLevels=[
+    {
+      icon:'🏛️',mode:'Miješano',chapter:'Veliki završni zadaci',name:'Kulturna baština BiH: posjete i prihod',
+      concept:'U većoj tabeli često prvo izračunamo nove kolone, a zatim koristimo funkcije SUM, COUNT, AVERAGE i MAX za sažetak.',
+      task:'Za kulturne lokalitete izračunaj Prihod u E2:E6 formulom cijena*posjete. U E7 saberi prihod, u D7 prebroj broj lokaliteta, u E8 pronađi najveći prihod, a u D8 prosječnu posjetu.',
+      setup:()=>{setHeaders(['Lokalitet','Grad','Cijena KM','Posjete','Prihod KM']);[
+        ['Stari most','Mostar',5,120],['Baščaršija','Sarajevo',0,250],['Tvrđava Kastel','Banja Luka',3,90],['Stećci Radimlja','Stolac',4,70],['Jajce vodopad','Jajce',2,160]
+      ].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));setCell('D7','Broj lokaliteta');setCell('D8','Prosjek posjeta');setCell('E7','Ukupno');setCell('E8','Najveći prihod');},
+      expectFormulas:{E2:'=C2*D2',E3:'=C3*D3',E4:'=C4*D4',E5:'=C5*D5',E6:'=C6*D6',E7:'=SUM(E2:E6)',D7:'=COUNT(D2:D6)',E8:'=MAX(E2:E6)',D8:'=AVERAGE(D2:D6)'},
+      expectFmtRange:{range:'C2:E8',fmt:'number'}
+    },
+    {
+      icon:'⚽',mode:'Miješano',chapter:'Veliki završni zadaci',name:'Nogometna reprezentacija BiH: bodovi igrača',
+      concept:'Formula može kombinovati množenje i sabiranje. Na primjer, ako gol vrijedi 2 boda, a asistencija 1 bod, formula je golovi*2+asistencije.',
+      task:'U D2:D6 izračunaj bodove formulom =B*2+C za svakog igrača. U D7 izračunaj ukupno, u D8 prosjek, u D9 najveći rezultat. Oboji naslov A1:D1 plavo i boldiraj ga.',
+      setup:()=>{setHeaders(['Igrač','Golovi','Asistencije','Bodovi']);[
+        ['Džeko',3,2],['Demirović',2,1],['Pjanić',1,4],['Krunić',1,2],['Kolašinac',0,3]
+      ].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));setCell('C7','Ukupno');setCell('C8','Prosjek');setCell('C9','Najviše');},
+      expectFormulas:{D2:'=B2*2+C2',D3:'=B3*2+C3',D4:'=B4*2+C4',D5:'=B5*2+C5',D6:'=B6*2+C6',D7:'=SUM(D2:D6)',D8:'=AVERAGE(D2:D6)',D9:'=MAX(D2:D6)'},
+      expectFill:{range:'A1:D1',color:'blue'},expectBoldRange:'A1:D1',expectFmtRange:{range:'B2:D9',fmt:'number'}
+    },
+    {
+      icon:'🤾',mode:'Miješano',chapter:'Veliki završni zadaci',name:'Rukometna reprezentacija BiH: dvije utakmice',
+      concept:'Kada imamo više kolona s podacima, možemo napraviti nekoliko novih računskih kolona: ukupno, prosjek i bodovi.',
+      task:'U D2:D6 saberi golove iz utakmica 1 i 2. U E2:E6 izračunaj prosjek po utakmici =D/2. U F2:F6 izračunaj bodove =D*3. Zatim u D7, E7 i F7 izračunaj SUM tih kolona.',
+      setup:()=>{setHeaders(['Igrač','Utakmica 1','Utakmica 2','Ukupno','Prosjek','Bodovi']);[
+        ['Burić',4,5],['Vranješ',6,3],['Prce',5,4],['Ovčina',2,6],['Panić',3,3]
+      ].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));setCell('C7','Ukupno kolone');},
+      expectFormulas:{D2:'=B2+C2',D3:'=B3+C3',D4:'=B4+C4',D5:'=B5+C5',D6:'=B6+C6',E2:'=D2/2',E3:'=D3/2',E4:'=D4/2',E5:'=D5/2',E6:'=D6/2',F2:'=D2*3',F3:'=D3*3',F4:'=D4*3',F5:'=D5*3',F6:'=D6*3',D7:'=SUM(D2:D6)',E7:'=SUM(E2:E6)',F7:'=SUM(F2:F6)'},
+      expectFmtRange:{range:'B2:F7',fmt:'number'}
+    },
+    {
+      icon:'🧪',mode:'Miješano',chapter:'Veliki završni zadaci',name:'Fizika 8. razred: brzina, put i vrijeme',
+      concept:'U fizici se formula za brzinu piše v=s/t. U tabeli to znači da vrijednost puta podijelimo vremenom, npr. =B2/C2.',
+      task:'U D2:D6 izračunaj brzinu formulom =B/C. U E2:E6 izračunaj dupli put =B*2. U F2:F6 izračunaj razliku =E-B. U D7 izračunaj prosječnu brzinu i u D8 najveću brzinu.',
+      setup:()=>{setHeaders(['Primjer','Put s (m)','Vrijeme t (s)','Brzina v','Dupli put','Razlika']);[
+        ['Trčanje',100,20],['Bicikl',240,30],['Autić',60,5],['Lopta',45,3],['Robot',36,6]
+      ].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));setCell('C7','Prosjek brzine');setCell('C8','Najveća brzina');},
+      expectFormulas:{D2:'=B2/C2',D3:'=B3/C3',D4:'=B4/C4',D5:'=B5/C5',D6:'=B6/C6',E2:'=B2*2',E3:'=B3*2',E4:'=B4*2',E5:'=B5*2',E6:'=B6*2',F2:'=E2-B2',F3:'=E3-B3',F4:'=E4-B4',F5:'=E5-B5',F6:'=E6-B6',D7:'=AVERAGE(D2:D6)',D8:'=MAX(D2:D6)'},
+      expectFmtRange:{range:'B2:F8',fmt:'number'}
+    },
+    {
+      icon:'📚',mode:'Miješano',chapter:'Veliki završni zadaci',name:'Moji predmeti: ocjene, težina i sortiranje',
+      concept:'Učenik može unijeti vlastite podatke, a zatim na njima koristiti formule, sortiranje i grafikon.',
+      task:'U A2:A6 upiši 5 svojih predmeta, u B2:B6 ocjene, a u C2:C6 težinu predmeta. Sortiraj predmete u A2:A6, u D2:D6 izračunaj ocjena*težina, u B7 prosjek ocjena, u D7 sumu bodova i ubaci stupčasti grafikon A2:B6.',
+      setup:()=>{setHeaders(['Predmet','Ocjena','Težina','Bodovi']);setCell('A2','Matematika');setCell('A3','Informatika');setCell('A4','Fizika');setCell('A5','Historija');setCell('A6','Bosanski');[5,5,4,4,5].forEach((v,i)=>setCell(addr(1,i+2),v));[2,2,1,1,1].forEach((v,i)=>setCell(addr(2,i+2),v));setCell('A7','Sažetak');setCell('C7','Ukupno bodova');},
+      needSortedRange:'A2:A6',expectFormulas:{D2:'=B2*C2',D3:'=B3*C3',D4:'=B4*C4',D5:'=B5*C5',D6:'=B6*C6',B7:'=AVERAGE(B2:B6)',D7:'=SUM(D2:D6)'},
+      expectFmtRange:{range:'B2:D7',fmt:'number'},needChart:true,needSelection:'A2:B6'
+    }
+  ];
+  finalLevels.forEach(L=>{if(!levels.some(x=>x.name===L.name))levels.push(L)});
+}
+addRichFinalLevelsV11();
+
+// V12: ispravka inline editora ćelija.
+// 1) Ako je jedna ćelija otvorena za uređivanje, klik/dvoklik na drugu prvo snima i zatvara prethodnu.
+// 2) Dok se uređuje formula, klik na istu ćeliju koja se uređuje NE ubacuje njenu adresu u formulu.
+function escapeAttrV12(v){return String(v??'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function commitInlineEditV12(opts={}){
+  const doRender=opts.render!==false;
+  if(!(editingInput&&document.body.contains(editingInput)&&editingCell))return false;
+  const a=editingCell;
+  const raw=String(editingInput.value??'').trim();
+  const result=evalFormula(raw);
+  if(Array.isArray(result)){
+    const p=parseAddr(a);
+    if(p)result.forEach((v,i)=>{if(p.r+i<=ROWS)setCell(addr(p.c,p.r+i),v,{formula:i===0?raw:''})});
+  }else{
+    setCell(a,result,{formula:raw.startsWith('=')?raw:''});
+  }
+  active=a;formulaTarget=a;formulaPickMode=false;formulaPickBase='';editingCell=null;editingInput=null;
+  formulaInput.value=cells[a]?.formula||cells[a]?.v||'';nameBox.textContent=a;
+  if(doRender)renderSheet();
+  return true;
+}
+function cancelInlineEditV12(){editingCell=null;editingInput=null;formulaPickBase='';renderSheet()}
+
+selectCell=function(a){
+  if(editingInput&&document.body.contains(editingInput)&&editingCell!==a){commitInlineEditV12({render:false});}
+  active=a;formulaTarget=a;formulaPickMode=false;formulaPickBase='';nameBox.textContent=a;
+  formulaInput.value=cells[a]?.formula||cells[a]?.v||'';
+  const fmt=document.getElementById('formatSelect'); if(fmt&&cells[a])fmt.value=cells[a].fmt||'automatic';
+}
+
+editCellInline=function(a){
+  if(editingInput&&document.body.contains(editingInput)){
+    if(editingCell===a){setTimeout(()=>{editingInput.focus();},0);return;}
+    commitInlineEditV12({render:true});
+  }
+  active=a;formulaTarget=a;formulaPickMode=false;formulaPickBase='';nameBox.textContent=a;
+  const el=document.querySelector(`.cell[data-addr="${a}"]`);if(!el)return;
+  const old=cells[a].formula||cells[a].v||'';
+  el.classList.add('active');
+  el.innerHTML=`<input class="cell-editor" value="${escapeAttrV12(old)}">`;
+  const inp=el.querySelector('input');editingCell=a;editingInput=inp;formulaInput.value=inp.value;
+  setTimeout(()=>{inp.focus();inp.select();},0);
+  inp.addEventListener('input',()=>{formulaInput.value=inp.value;if(inp.value.trim().startsWith('='))formulaPickBase=''});
+  inp.addEventListener('mousedown',e=>e.stopPropagation());
+  inp.addEventListener('click',e=>e.stopPropagation());
+  inp.addEventListener('dblclick',e=>e.stopPropagation());
+  inp.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();formulaInput.value=inp.value;commitInlineEditV12({render:true});flash(`Upisano u ${a}.`,'ok')}
+    else if(e.key==='Escape'){e.preventDefault();cancelInlineEditV12()}
+  });
+}
+
+renderSheet=function(){
+  sheet.innerHTML='';
+  sheet.style.gridTemplateColumns='44px '+colWidths.map(w=>w+'px').join(' ');
+  sheet.style.gridAutoRows='unset';
+  const corner=document.createElement('div');corner.className='corner';corner.style.height='34px';sheet.appendChild(corner);
+  letters.forEach((l,i)=>{
+    const e=document.createElement('div');e.className='col-head'+(colWidths[i]!==110?' resized':'');e.textContent=l;e.style.height='34px';
+    const h=document.createElement('span');h.className='col-resizer';h.title='Povuci za promjenu širine kolone';h.onmousedown=(ev)=>startResizeCol(ev,i);
+    e.appendChild(h);sheet.appendChild(e);
+  });
+  for(let r=1;r<=ROWS;r++){
+    const rh=document.createElement('div');rh.className='row-head'+(rowHeights[r-1]!==42?' resized':'');rh.textContent=r;rh.style.height=rowHeights[r-1]+'px';
+    const hr=document.createElement('span');hr.className='row-resizer';hr.title='Povuci za promjenu visine reda';hr.onmousedown=(ev)=>startResizeRow(ev,r-1);rh.appendChild(hr);sheet.appendChild(rh);
+    for(let c=0;c<COLS;c++){
+      const a=addr(c,r),data=cells[a];
+      const el=document.createElement('div');el.className='cell';el.dataset.addr=a;el.textContent=displayCell(a);el.style.height=rowHeights[r-1]+'px';
+      if(a===active)el.classList.add('active');
+      if(selection.includes(a))el.classList.add('selected');
+      if(data.bold)el.classList.add('bold');
+      if(data.italic)el.classList.add('italic');
+      if(data.fmt==='date')el.classList.add('fmt-date');
+      if(data.fmt==='currency')el.classList.add('fmt-currency');
+      if(data.fmt==='percent')el.classList.add('fmt-percent');
+      if(data.fill)el.classList.add('fill-'+data.fill);
+      if(targetAddrsForLevel().includes(a))el.classList.add('target');
+      if(a===active && !editingInput){
+        const fh=document.createElement('span');fh.className='fill-handle';fh.title='Povuci prema dole za kopiranje formule';fh.onmousedown=(ev)=>startFillHandleV10(ev,a);el.appendChild(fh);
+      }
+      el.onmousedown=(ev)=>{
+        if(ev.target.classList&&ev.target.classList.contains('fill-handle'))return;
+        if(ev.detail>=2){ev.preventDefault();ev.stopPropagation();dragging=false;return;}
+        const src=formulaSource();
+        // Klik na istu ćeliju u kojoj se formula uređuje ne smije dodati npr. E7 u E7.
+        if(src&&src.target===a){
+          ev.preventDefault();ev.stopPropagation();dragging=false;selection=[a];active=a;formulaTarget=a;nameBox.textContent=a;updateSelectionClasses();
+          if(src.type==='cell')setTimeout(()=>{src.input.focus();src.input.setSelectionRange(src.input.value.length,src.input.value.length)},0);
+          return;
+        }
+        // Ako se ne piše formula, prelazak na drugu ćeliju prvo zatvara/snimа prethodni inline editor.
+        if(editingInput&&document.body.contains(editingInput)&&!src){commitInlineEditV12({render:false});}
+        dragging=true;dragStart=a;selection=[a];
+        if(formulaSource()){formulaPickBase='';previewRangeInFormula();updateSelectionClasses();return;}
+        selectCell(a);renderSheet();
+      };
+      el.onmouseenter=()=>{if(dragging&&dragStart){selection=makeRect(dragStart,a);if(formulaSource()){previewRangeInFormula();updateSelectionClasses()}else renderSheet()}};
+      el.onmouseup=()=>{if(formulaSource()){finishRangePick()} dragging=false;};
+      el.ondblclick=(ev)=>{ev.preventDefault();ev.stopPropagation();dragging=false;editCellInline(a)};
+      sheet.appendChild(el);
+    }
+  }
+}
+
+
+
+/* ===== v14: stvarna ispravka klika na ćeliju koja se trenutno uređuje =====
+   Stariji capture handler koristi funkciju cellFromEventV8. Zato ovdje mijenjamo
+   baš tu funkciju: ako je klik unutar iste ćelije koja se trenutno uređuje,
+   vraća null i handler nema šta ubaciti u formulu. */
+const oldCellFromEventV8_v14 = cellFromEventV8;
+cellFromEventV8 = function(ev){
+  const el = ev.target && ev.target.closest ? ev.target.closest('.cell') : null;
+  if(!el || !el.dataset || !el.dataset.addr) return null;
+  const clicked = String(el.dataset.addr || '').toUpperCase();
+  const edited = editingCell ? String(editingCell).toUpperCase() : '';
+  const src = (typeof currentFormulaSourceV8 === 'function') ? currentFormulaSourceV8() : null;
+  const srcTarget = src && src.target ? String(src.target).toUpperCase() : '';
+
+  // Najvažnije: nikad ne ubacuj adresu ćelije u samu sebe dok se ona uređuje.
+  // Radi i kad klikneš na input, tekst, ivicu ili prazan dio iste ćelije.
+  if(edited && clicked === edited) return null;
+  if(srcTarget && clicked === srcTarget && src && src.type === 'cell') return null;
+
+  if(ev.target.classList && ev.target.classList.contains('cell-editor')) return null;
+  return clicked;
+};
+
+// Dodatna zaštita u završnom render handleru: ista ćelija samo vraća fokus u editor.
+const oldRenderSheet_v14 = renderSheet;
+renderSheet = function(){
+  oldRenderSheet_v14();
+  document.querySelectorAll('.cell').forEach(el=>{
+    const a = el.dataset.addr;
+    const oldDown = el.onmousedown;
+    el.onmousedown = function(ev){
+      const src = formulaSource();
+      if(src && src.type === 'cell' && src.target && String(src.target).toUpperCase() === String(a).toUpperCase()){
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation();
+        dragging = false;
+        selection = [a];
+        active = a;
+        formulaTarget = a;
+        nameBox.textContent = a;
+        updateSelectionClasses();
+        setTimeout(()=>{
+          if(src.input && document.body.contains(src.input)){
+            src.input.focus();
+            try{src.input.setSelectionRange(src.input.value.length, src.input.value.length)}catch(e){}
+          }
+        },0);
+        return false;
+      }
+      return oldDown ? oldDown.call(this, ev) : undefined;
+    };
+  });
+};
+
+
+
+/* ===== v15: automatsko ažuriranje formula i pouzdan fill handle ===== */
+let __calcStackV15=[];
+const rawGetCellV15 = getCell;
+getCell = function(a){
+  a = String(a||'').toUpperCase();
+  if(!cells[a]) return '';
+  const cell = cells[a];
+  if(cell.formula){
+    if(__calcStackV15.includes(a)) return '';
+    __calcStackV15.push(a);
+    let val = evalFormula(cell.formula);
+    __calcStackV15.pop();
+    return Array.isArray(val) ? (val[0] ?? '') : val;
+  }
+  return cell.v ?? '';
+};
+
+displayCell = function(a){
+  let d = cells[a];
+  if(!d) return '';
+  let v = getCell(a);
+  if(Array.isArray(v)) return v.join(', ');
+  if(v==='' || v===null || v===undefined) return '';
+  if(d.fmt==='number' && d.dec!==null && !Number.isNaN(Number(v))) return Number(v).toFixed(d.dec);
+  if(d.fmt==='currency' && d.dec!==null && !Number.isNaN(Number(v))) return Number(v).toFixed(d.dec);
+  if(d.fmt==='percent' && d.dec!==null && !Number.isNaN(Number(v))) return Number(v).toFixed(d.dec);
+  return String(v);
+};
+
+// Kada se promijeni obična ćelija, sve formule se prikazuju ponovo kroz displayCell/getCell,
+// pa SUM, AVERAGE i obični izrazi tipa =A3*B3 odmah pokažu novi rezultat.
+const oldCommitFormulaV15 = commitFormula;
+commitFormula = function(rawOverride=null){
+  oldCommitFormulaV15(rawOverride);
+  refreshChartFromSelectionV15();
+};
+
+function cellUnderPointerV15(ev){
+  const hit = document.elementFromPoint(ev.clientX, ev.clientY);
+  const el = hit && hit.closest ? hit.closest('.cell') : null;
+  return el && el.dataset ? el.dataset.addr : null;
+}
+function applyFillToV15(startAddr,endAddr){
+  const start=parseAddr(startAddr), end=parseAddr(endAddr);
+  if(!start||!end) return false;
+  if(end.c!==start.c || end.r<=start.r) return false;
+  const src=cells[startAddr];
+  for(let r=start.r+1;r<=end.r;r++){
+    const a=addr(start.c,r);
+    const delta=r-start.r;
+    if(src.formula){
+      const nf=shiftFormulaRefsV10(src.formula,delta,0);
+      setCell(a, evalFormula(nf), {formula:nf,fmt:src.fmt,dec:src.dec,bold:src.bold,fill:src.fill,italic:src.italic});
+    }else{
+      setCell(a, src.v, {formula:'',fmt:src.fmt,dec:src.dec,bold:src.bold,fill:src.fill,italic:src.italic});
+    }
+  }
+  return true;
+}
+
+// Zamijeni stari fill handle: koristimo mousemove + elementFromPoint, pa radi i kada miš brzo ide preko ćelija.
+startFillHandleV10 = function(ev,a){
+  ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();
+  if(editingInput && document.body.contains(editingInput)) return;
+  fillDragV10={start:a,end:a};
+  dragging=false;formulaPointerDrag=false;
+  selection=[a];active=a;formulaTarget=a;
+  document.body.classList.add('dragging-fill');
+  updateSelectionClasses();
+};
+
+document.addEventListener('mousemove',function(ev){
+  if(!fillDragV10) return;
+  const a = cellUnderPointerV15(ev); if(!a) return;
+  const s=parseAddr(fillDragV10.start), e=parseAddr(a); if(!s||!e||e.c!==s.c) return;
+  fillDragV10.end=a;
+  selection=makeRect(fillDragV10.start,a);
+  document.querySelectorAll('.cell.fill-preview').forEach(x=>x.classList.remove('fill-preview'));
+  selection.forEach(x=>{const el=document.querySelector(`.cell[data-addr="${x}"]`);if(el)el.classList.add('fill-preview')});
+},true);
+
+document.addEventListener('mouseup',function(ev){
+  if(!fillDragV10) return;
+  ev.preventDefault();ev.stopPropagation();ev.stopImmediatePropagation();
+  const start=fillDragV10.start, end=fillDragV10.end;
+  document.body.classList.remove('dragging-fill');
+  document.querySelectorAll('.cell.fill-preview').forEach(x=>x.classList.remove('fill-preview'));
+  const done=applyFillToV15(start,end);
+  fillDragV10=null;
+  renderSheet();
+  if(done) flash('Formula je kopirana prema dole i sve povezane formule su odmah ažurirane.','ok');
+},true);
+
+// Globalni handler za ubacivanje adrese u formulu ne smije presresti tačku za kopiranje.
+const oldCellFromEventV8_v15 = cellFromEventV8;
+cellFromEventV8 = function(ev){
+  if(ev.target && ev.target.closest && ev.target.closest('.fill-handle')) return null;
+  return oldCellFromEventV8_v15(ev);
+};
+
+function refreshChartFromSelectionV15(){
+  // Ako je grafikon već ubačen, ne diramo tip, ali dozvoljavamo da učenik ponovo klikne grafikon
+  // nakon promjene podataka. Ovo sprječava nepotrebno skakanje grafikona pri svakom unosu.
+}
+
+setupSelect();resetLevel();
+
+// v13 učvršćuje pravilo: aktivna ćelija koja se uređuje nikad se sama ne ubacuje kao referenca u vlastitu formulu.
+
+
+
+/* ===== v17: direktno popravljena glavna mousedown logika za istu ćeliju ===== */
+
+/* ===== v16: trajna zaštita od ubacivanja adrese iste ćelije u vlastitu formulu =====
+   Problem se vraćao jer stariji capture handler radi na mousedown. Ovdje koristimo
+   pointerdown (koji dolazi prije mousedown) da zapamtimo da je klik bio na istoj ćeliji,
+   pa svi kasniji handleri ignoriraju taj klik kao referencu formule. */
+window.__sameCellFormulaClickV16 = null;
+function normAddrV16(a){ return String(a||'').trim().toUpperCase(); }
+function eventCellAddrV16(ev){
+  if(!ev) return null;
+  if(ev.target && ev.target.closest){
+    const el = ev.target.closest('.cell');
+    if(el && el.dataset && el.dataset.addr) return normAddrV16(el.dataset.addr);
+  }
+  if(ev.composedPath){
+    const path = ev.composedPath();
+    for(const n of path){
+      if(n && n.classList && n.classList.contains('cell') && n.dataset && n.dataset.addr) return normAddrV16(n.dataset.addr);
+    }
+  }
+  return null;
+}
+function activeFormulaTargetV16(){
+  const src1 = (typeof formulaSource === 'function') ? formulaSource() : null;
+  const src2 = (typeof currentFormulaSourceV8 === 'function') ? currentFormulaSourceV8() : null;
+  const src = src1 || src2;
+  if(src && src.target) return normAddrV16(src.target);
+  if(editingCell && editingInput && document.body.contains(editingInput) && String(editingInput.value||'').trim().startsWith('=')) return normAddrV16(editingCell);
+  return '';
+}
+document.addEventListener('pointerdown', function(ev){
+  if(ev.target && ev.target.closest && ev.target.closest('.fill-handle')) return;
+  const clicked = eventCellAddrV16(ev);
+  const target = activeFormulaTargetV16();
+  if(clicked && target && clicked === target){
+    window.__sameCellFormulaClickV16 = clicked;
+    setTimeout(()=>{ if(window.__sameCellFormulaClickV16 === clicked) window.__sameCellFormulaClickV16 = null; }, 80);
+  }
+}, true);
+
+const oldCellFromEventV8_v16 = cellFromEventV8;
+cellFromEventV8 = function(ev){
+  if(ev.target && ev.target.closest && ev.target.closest('.fill-handle')) return null;
+  const clicked = eventCellAddrV16(ev);
+  const target = activeFormulaTargetV16();
+  if(clicked && target && clicked === target) return null;
+  if(clicked && window.__sameCellFormulaClickV16 && clicked === window.__sameCellFormulaClickV16) return null;
+  return oldCellFromEventV8_v16 ? oldCellFromEventV8_v16(ev) : clicked;
+};
+
+const oldFormulaSource_v16 = formulaSource;
+formulaSource = function(){
+  if(editingInput && document.body.contains(editingInput)){
+    const v = String(editingInput.value||'').trim();
+    if(v.startsWith('=')) return {input:editingInput, target:normAddrV16(editingCell), type:'cell'};
+  }
+  return oldFormulaSource_v16 ? oldFormulaSource_v16() : null;
+};
+
+const oldCurrentFormulaSourceV8_v16 = currentFormulaSourceV8;
+currentFormulaSourceV8 = function(){
+  if(editingInput && document.body.contains(editingInput)){
+    const v = String(editingInput.value||'').trim();
+    if(v.startsWith('=')) return {input:editingInput, target:normAddrV16(editingCell), type:'cell'};
+  }
+  return oldCurrentFormulaSourceV8_v16 ? oldCurrentFormulaSourceV8_v16() : null;
+};
+
+// Još jedna zaštita na nivou samog renderovanog elementa: ista ćelija samo vraća fokus u editor.
+const oldRenderSheet_v16 = renderSheet;
+renderSheet = function(){
+  oldRenderSheet_v16();
+  document.querySelectorAll('.cell').forEach(el=>{
+    const a = normAddrV16(el.dataset.addr);
+    const oldDown = el.onmousedown;
+    el.onmousedown = function(ev){
+      if(ev.target && ev.target.closest && ev.target.closest('.fill-handle')){
+        return oldDown ? oldDown.call(this, ev) : undefined;
+      }
+      const target = activeFormulaTargetV16();
+      if(target && a === target){
+        window.__sameCellFormulaClickV16 = a;
+        ev.stopPropagation();
+        // Ne koristimo preventDefault ovdje, da klik u inputu i dalje može pomicati kursor.
+        dragging = false;
+        selection = [a];
+        active = a;
+        formulaTarget = a;
+        nameBox.textContent = a;
+        updateSelectionClasses();
+        setTimeout(()=>{
+          if(editingInput && document.body.contains(editingInput)){
+            editingInput.focus();
+          }
+        },0);
+        return false;
+      }
+      return oldDown ? oldDown.call(this, ev) : undefined;
+    };
+  });
+};
+
+// Odmah osvježi tabelu da ćelije dobiju novi handler.
+try{ renderSheet(); }catch(e){}
+
+
+/* ===== v18: konačna zaštita od ubacivanja aktivne ćelije u vlastitu formulu =====
+   Problem se dešavao jer su različiti handleri mogli doći do preview/apply funkcije.
+   Zato je zaštita sada na zadnjoj tački: prije bilo kakvog upisa reference u formulu. */
+function normAddrV18(a){ return String(a||'').trim().toUpperCase(); }
+function formulaEditTargetV18(src){
+  if(src && src.target) return normAddrV18(src.target);
+  if(editingInput && document.body.contains(editingInput) && editingCell) return normAddrV18(editingCell);
+  if(String(formulaInput.value||'').trim().startsWith('=')) return normAddrV18(formulaTarget || active || nameBox.textContent);
+  return '';
+}
+function isOnlySameCellRefV18(rng, target){
+  rng = normAddrV18(rng).replace(/\$/g,'');
+  target = normAddrV18(target).replace(/\$/g,'');
+  return !!target && (rng === target || rng === (target + ':' + target));
+}
+function focusFormulaSourceV18(src){
+  const input = src && src.input ? src.input : (editingInput && document.body.contains(editingInput) ? editingInput : formulaInput);
+  setTimeout(()=>{
+    if(input && document.body.contains(input)){
+      input.focus();
+      try{ input.setSelectionRange(input.value.length,input.value.length); }catch(e){}
+    }
+  },0);
+}
+
+const __oldApplyFormulaReferenceV18 = applyFormulaReferenceV8;
+applyFormulaReferenceV8 = function(src, rng){
+  const target = formulaEditTargetV18(src);
+  if(isOnlySameCellRefV18(rng, target)){
+    formulaPointerDrag = false;
+    formulaPointerStart = null;
+    formulaPointerSrc = null;
+    formulaPickBase = '';
+    dragging = false;
+    selection = [target];
+    active = target;
+    formulaTarget = target;
+    nameBox.textContent = target;
+    updateSelectionClasses();
+    focusFormulaSourceV18(src);
+    return;
+  }
+  return __oldApplyFormulaReferenceV18(src, rng);
+};
+
+const __oldPreviewRangeInFormulaV18 = previewRangeInFormula;
+previewRangeInFormula = function(){
+  const src = formulaSource();
+  const rng = rangeTextFromSelection();
+  const target = formulaEditTargetV18(src);
+  if(isOnlySameCellRefV18(rng, target)){
+    dragging = false;
+    formulaPickBase = '';
+    selection = [target];
+    active = target;
+    formulaTarget = target;
+    nameBox.textContent = target;
+    updateSelectionClasses();
+    focusFormulaSourceV18(src);
+    return;
+  }
+  return __oldPreviewRangeInFormulaV18();
+};
+
+const __oldCellFromEventV18 = cellFromEventV8;
+cellFromEventV8 = function(ev){
+  if(ev.target && ev.target.closest && ev.target.closest('.fill-handle')) return null;
+  const el = ev.target && ev.target.closest ? ev.target.closest('.cell') : null;
+  const clicked = el && el.dataset ? normAddrV18(el.dataset.addr) : '';
+  const target = formulaEditTargetV18((typeof currentFormulaSourceV8==='function'?currentFormulaSourceV8():null) || (typeof formulaSource==='function'?formulaSource():null));
+  if(clicked && target && clicked === target) return null;
+  return __oldCellFromEventV18 ? __oldCellFromEventV18(ev) : clicked;
+};
+
+// Capture handler koji samo za istu ćeliju zaustavlja dalji formula-pick,
+// ali ne sprečava normalno pomjeranje kursora unutar inputa.
+document.addEventListener('mousedown', function(ev){
+  // VAŽNO: tačkica za kopiranje formule je unutar aktivne ćelije.
+  // Zato je ne smijemo blokirati kao "klik na istu ćeliju".
+  if(ev.target && ev.target.closest && ev.target.closest('.fill-handle')) return;
+  const el = ev.target && ev.target.closest ? ev.target.closest('.cell') : null;
+  const clicked = el && el.dataset ? normAddrV18(el.dataset.addr) : '';
+  const src = (typeof currentFormulaSourceV8==='function'?currentFormulaSourceV8():null) || (typeof formulaSource==='function'?formulaSource():null);
+  const target = formulaEditTargetV18(src);
+  if(clicked && target && clicked === target){
+    formulaPointerDrag = false;
+    formulaPointerStart = null;
+    formulaPointerSrc = null;
+    formulaPickBase = '';
+    dragging = false;
+    selection = [target];
+    active = target;
+    formulaTarget = target;
+    nameBox.textContent = target;
+    updateSelectionClasses();
+    ev.stopPropagation();
+    // Ne preventDefault: klik u editoru treba normalno postaviti kursor.
+  }
+}, true);
+
+
+
+/* ===== v19: popravljena tačkica za povlačenje formule bez kvarenja self-reference zaštite =====
+   v18 je dobro blokirao ubacivanje iste ćelije u vlastitu formulu, ali je isti capture handler
+   presretao i mousedown na .fill-handle jer je tačkica fizički unutar aktivne ćelije.
+   Gornji handler sada preskače .fill-handle, a ovdje dodatno osiguravamo da tačkica pokrene fill. */
+(function(){
+  const oldRenderSheetV19 = renderSheet;
+  renderSheet = function(){
+    oldRenderSheetV19();
+    document.querySelectorAll('.fill-handle').forEach(h=>{
+      h.onmousedown = function(ev){
+        ev.preventDefault();
+        ev.stopPropagation();
+        ev.stopImmediatePropagation();
+        const cell = h.closest('.cell');
+        const a = cell && cell.dataset ? cell.dataset.addr : active;
+        if(typeof startFillHandleV10 === 'function') startFillHandleV10(ev,a);
+        return false;
+      };
+    });
+  };
+  try{ renderSheet(); }catch(e){}
+})();
+
+
+
+/* ===== v20: finalne korekcije - redoslijed, linijski grafikoni, formule i težina zadataka ===== */
+(function(){
+  const css=document.createElement('style');
+  css.textContent=`
+    .difficulty-badge{display:inline-flex;align-items:center;margin-left:6px;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900;border:1px solid transparent;vertical-align:middle;white-space:nowrap}
+    .difficulty-easy{background:#dcfce7!important;color:#166534!important;border-color:#86efac!important}
+    .difficulty-medium{background:#ffedd5!important;color:#9a3412!important;border-color:#fdba74!important}
+    .difficulty-hard{background:#fee2e2!important;color:#991b1b!important;border-color:#fca5a5!important}
+    .chapter.difficulty-easy{background:#dcfce7!important;color:#166534!important;border-color:#86efac!important}
+    .chapter.difficulty-medium{background:#ffedd5!important;color:#9a3412!important;border-color:#fdba74!important}
+    .chapter.difficulty-hard{background:#fee2e2!important;color:#991b1b!important;border-color:#fca5a5!important}
+    .chart-line-wrap{height:130px;border-left:2px solid #cbd5e1;border-bottom:2px solid #cbd5e1;padding:8px;position:relative;background:linear-gradient(180deg,#fff,#f8fafc)}
+    .chart-line-wrap svg{width:100%;height:100%;overflow:visible}
+    .line-label{font-size:10px;font-weight:900;fill:#475569}.line-value{font-size:10px;font-weight:900;fill:#111827}
+  `;
+  document.head.appendChild(css);
+
+  window.chartType='';
+  function levelDifficultyLabel(d){return d==='hard'?'Teški':(d==='medium'?'Teži':'Jednostavni');}
+  function diffClass(d){return d==='hard'?'difficulty-hard':(d==='medium'?'difficulty-medium':'difficulty-easy');}
+  function cloneLevel(L,patch={}){return Object.assign({},L,patch);}
+  function normalizeStartLevel(L){
+    return cloneLevel(L,{mode:'Uređivanje',chapter:'Uređivanje i formatiranje ćelije'});
+  }
+  function markLevels(list,level){list.forEach(L=>{if(!L.difficulty)L.difficulty=level;});return list;}
+  function chartPairsV20(){return (typeof chartPairsFromSelection==='function'?chartPairsFromSelection():[]);}
+  function resetChartV20(){window.chartType=''; if(typeof hideChart==='function')hideChart();}
+  const oldHideChartV20=hideChart;
+  hideChart=function(){window.chartType=''; return oldHideChartV20?oldHideChartV20():undefined;};
+
+  const oldInsertChartV20=insertChart;
+  insertChart=function(){window.chartType='bar'; return oldInsertChartV20?oldInsertChartV20():undefined;};
+  const oldInsertPieChartV20=insertPieChart;
+  insertPieChart=function(){window.chartType='pie'; return oldInsertPieChartV20?oldInsertPieChartV20():undefined;};
+
+  window.insertLineChart=function(){
+    const pairs=chartPairsV20();
+    if(!pairs.length){flash('Odaberi raspon sa nazivima i brojevima, npr. A2:B6, pa ubaci linijski grafikon.','no');return;}
+    chartInserted=true;window.chartType='line';chartRange=rangeTextFromSelection();
+    const box=placeChartBox();
+    document.getElementById('chartTitle').textContent='Linijski grafikon: '+(chartRange||'odabrani raspon');
+    const vals=pairs.slice(0,10).map(p=>Number(p[1]));
+    const labs=pairs.slice(0,10).map(p=>String(p[0]).slice(0,8));
+    const min=Math.min(...vals), max=Math.max(...vals), span=(max-min)||1;
+    const W=285,H=96,left=16,bottom=18,top=8;
+    const points=vals.map((v,i)=>{
+      const x=left+(i*(W-left-8)/Math.max(1,vals.length-1));
+      const y=top+(H-bottom-top)-((v-min)/span)*(H-bottom-top);
+      return [x,y,v,labs[i]];
+    });
+    const poly=points.map(p=>p[0]+','+p[1]).join(' ');
+    const circles=points.map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#2563eb"></circle><text class="line-value" x="${p[0]}" y="${p[1]-8}" text-anchor="middle">${p[2]}</text><text class="line-label" x="${p[0]}" y="${H-2}" text-anchor="middle">${p[3]}</text>`).join('');
+    const bars=document.getElementById('chartBars');
+    bars.className='chart-line-wrap';
+    bars.innerHTML=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><polyline points="${poly}" fill="none" stroke="#2563eb" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"></polyline>${circles}</svg>`;
+    flash('Ubačen je linijski grafikon. On je najbolji kada pratimo promjenu kroz vrijeme ili redoslijed.','ok');
+  };
+  const toolbar=document.querySelector('.toolbar');
+  if(toolbar && !document.getElementById('lineChartBtn')){
+    const b=document.createElement('button');b.className='tool-btn';b.id='lineChartBtn';b.textContent='Linijski grafikon';b.onclick=()=>insertLineChart();
+    const pie=[...toolbar.querySelectorAll('button')].find(x=>x.textContent.includes('Tortni grafikon'));
+    (pie||toolbar.lastElementChild).after(b);
+  }
+
+  function dataRows(rows){rows.forEach((row,ri)=>row.forEach((v,ci)=>setCell(addr(ci,ri+1),v,{bold:ri===0,fill:ri===0?'blue':''})));}
+  const newChartLevels=[
+    {icon:'📊',mode:'Grafikoni',chapter:'Grafikoni',name:'Stupčasti grafikon: prodaja u kantini',difficulty:'easy',concept:'Stupčasti grafikon je dobar za poređenje više kategorija.',task:'Označi A2:B6 i klikni “Stupčasti grafikon”.',setup:()=>dataRows([['Proizvod','Prodato'],['Sendvič',18],['Sok',25],['Voda',21],['Voće',12],['Čokolada',16]]),needChart:true,expectedChartType:'bar',needSelection:'A2:B6'},
+    {icon:'🥧',mode:'Grafikoni',chapter:'Grafikoni',name:'Tortni grafikon: udjeli aktivnosti',difficulty:'easy',concept:'Tortni grafikon prikazuje dijelove jedne cjeline.',task:'Označi A2:B5 i klikni “Tortni grafikon”.',setup:()=>dataRows([['Aktivnost','Učenici'],['Sport',14],['Robotika',8],['Likovna',5],['Muzika',3]]),needChart:true,expectedChartType:'pie',needSelection:'A2:B5'},
+    {icon:'📈',mode:'Grafikoni',chapter:'Grafikoni',name:'Linijski grafikon: temperatura kroz sedmicu',difficulty:'easy',concept:'Linijski grafikon pokazuje kako se vrijednost mijenja kroz vrijeme.',task:'Označi A2:B8 i klikni “Linijski grafikon”.',setup:()=>dataRows([['Dan','Temperatura'],['Pon',14],['Uto',16],['Sri',18],['Čet',17],['Pet',20],['Sub',22],['Ned',19]]),needChart:true,expectedChartType:'line',needSelection:'A2:B8'},
+    {icon:'📈',mode:'Grafikoni',chapter:'Grafikoni',name:'Linijski grafikon: rast štednje',difficulty:'medium',concept:'Kada su podaci poredani po mjesecima, linijski grafikon jasnije pokazuje rast ili pad.',task:'Označi A2:B7 i klikni “Linijski grafikon”.',setup:()=>dataRows([['Mjesec','Ušteđeno KM'],['Januar',20],['Februar',35],['Mart',50],['April',65],['Maj',80],['Juni',110]]),needChart:true,expectedChartType:'line',needSelection:'A2:B7'},
+    {icon:'🤔',mode:'Grafikoni',chapter:'Grafikoni',name:'Sam odaberi najbolji grafikon',difficulty:'medium',concept:'Nije svaki grafikon jednako dobar. Za promjenu kroz vrijeme najbolji je linijski grafikon, za poređenje kategorija stupčasti, a za udjele tortni.',task:'Podaci prikazuju broj posjeta web stranici po danima. Označi A2:B8 i samostalno odaberi grafikon koji najbolje prikazuje promjenu kroz sedmicu.',setup:()=>dataRows([['Dan','Posjete'],['Pon',40],['Uto',55],['Sri',52],['Čet',70],['Pet',90],['Sub',120],['Ned',105]]),needChart:true,expectedChartType:'line',needSelection:'A2:B8',chartHint:'Za ovaj zadatak bolji je linijski grafikon jer se prati promjena kroz dane. Stupčasti samo poredi dane, a tortni bi pogrešno naglasio udjele umjesto kretanja kroz vrijeme.'},
+    {icon:'📊',mode:'Grafikoni',chapter:'Grafikoni',name:'Koji razred ima najviše bodova',difficulty:'easy',concept:'Kada želimo porediti razrede, stupčasti grafikon je pregledan izbor.',task:'Označi A2:B6 i klikni “Stupčasti grafikon”.',setup:()=>dataRows([['Razred','Bodovi'],['VI-1',72],['VI-2',68],['VII-1',81],['VII-2',75],['VIII-1',88]]),needChart:true,expectedChartType:'bar',needSelection:'A2:B6'}
+  ];
+  const newFormulaLevels=[
+    {icon:'➕',mode:'Formule',chapter:'Računske formule',name:'Formula sa sabiranjem dvije ćelije',difficulty:'easy',concept:'Formula može biti običan račun sa adresama ćelija.',task:'U D2 izračunaj ukupan broj bodova formulom =B2+C2.',setup:()=>{setHeaders(['Učenik','Test','Projekt','Ukupno']);setCell('A2','Amina');setCell('B2',18);setCell('C2',20)},target:'D2',expectFormula:'=B2+C2'},
+    {icon:'➗',mode:'Formule',chapter:'Računske formule',name:'Formula sa dijeljenjem',difficulty:'easy',concept:'Dijeljenje se u tabeli piše znakom /.',task:'U D2 izračunaj prosjek po utakmici formulom =B2/C2.',setup:()=>{setHeaders(['Igrač','Ukupno golova','Broj utakmica','Prosjek']);setCell('A2','Panić');setCell('B2',12);setCell('C2',3)},target:'D2',expectFormula:'=B2/C2'},
+    {icon:'🧮',mode:'Formule',chapter:'Računske formule',name:'Cijena puta količina',difficulty:'easy',concept:'Za ukupnu cijenu koristimo množenje cijene i količine.',task:'U D2 izračunaj ukupno formulom =B2*C2.',setup:()=>{setHeaders(['Proizvod','Cijena','Količina','Ukupno']);setCell('A2','Sveska');setCell('B2',2);setCell('C2',15)},target:'D2',expectFormula:'=B2*C2'},
+    {icon:'⚙️',mode:'Formule',chapter:'Računske formule',name:'Formula sa zagradama',difficulty:'medium',concept:'Zagrade određuju šta se prvo računa.',task:'U D2 izračunaj rezultat formulom =(B2+C2)*2.',setup:()=>{setHeaders(['Ekipa','Prvi dio','Drugi dio','Rezultat']);setCell('A2','Zmajevi');setCell('B2',7);setCell('C2',8)},target:'D2',expectFormula:'=(B2+C2)*2'},
+    {icon:'📋',mode:'Formule',chapter:'Računske formule',name:'Kopiranje formule prema dole',difficulty:'medium',concept:'Kada se formula kopira prema dole, adrese ćelija se automatski prilagođavaju redovima.',task:'U D2 upiši =B2*C2, zatim tačkicom povuci formulu do D5 da se izračunaju sve stavke.',setup:()=>dataRows([['Stavka','Cijena','Količina','Ukupno'],['Olovka',1,20],['Sveska',2,15],['Marker',3,8],['Papir',5,6]]),expectFormulas:{D2:'=B2*C2',D3:'=B3*C3',D4:'=B4*C4',D5:'=B5*C5'}}
+  ];
+  const newMixedLevels=[
+    {icon:'🧩',mode:'Miješano',chapter:'Završni izazovi',name:'Troškovi izleta: formule i grafikon',difficulty:'medium',concept:'Miješani zadatak traži više koraka: računanje i grafički prikaz.',task:'U D2:D5 izračunaj =B*C za svaku stavku. U D6 izračunaj SUM(D2:D5), zatim označi A2:D5 i ubaci stupčasti grafikon.',setup:()=>dataRows([['Stavka','Cijena','Količina','Ukupno'],['Prevoz',4,25],['Muzej',3,25],['Hrana',5,25],['Materijal',2,25]]),expectFormulas:{D2:'=B2*C2',D3:'=B3*C3',D4:'=B4*C4',D5:'=B5*C5',D6:'=SUM(D2:D5)'},needChart:true,expectedChartType:'bar',needSelection:'A2:D5'},
+    {icon:'🧩',mode:'Miješano',chapter:'Završni izazovi',name:'Prisustvo: odsutni i prosjek',difficulty:'medium',concept:'U miješanom zadatku često treba sam prepoznati koje formule imaju smisla.',task:'U C2:C6 izračunaj broj odsutnih formulama =25-B2 itd. U B7 izračunaj AVERAGE(B2:B6), a u C7 AVERAGE(C2:C6).',setup:()=>dataRows([['Dan','Prisutni','Odsutni'],['Pon',22],['Uto',20],['Sri',24],['Čet',21],['Pet',23]]),expectFormulas:{C2:'=25-B2',C3:'=25-B3',C4:'=25-B4',C5:'=25-B5',C6:'=25-B6',B7:'=AVERAGE(B2:B6)',C7:'=AVERAGE(C2:C6)'}},
+    {icon:'🔥',mode:'Miješano',chapter:'Finalni izazovi',name:'Mini izvještaj: format, formule i linijski grafikon',difficulty:'hard',concept:'Crveni zadatak ima više od jedne stvari: unos/formule, formatiranje i grafikon.',task:'U A2:A7 unesi dane, u B2:B7 brojeve. U B8 izračunaj SUM, u B9 AVERAGE, formatiraj B2:B9 kao broj, oboji A1:B1 plavo i ubaci linijski grafikon A2:B7.',setup:()=>{setHeaders(['Dan','Vrijednost']);},expectFormulas:{B8:'=SUM(B2:B7)',B9:'=AVERAGE(B2:B7)'},expectFmtRange:{range:'B2:B9',fmt:'number'},expectFill:{range:'A1:B1',color:'blue'},needChart:true,expectedChartType:'line',needSelection:'A2:B7'}
+  ];
+
+  function uniqueByName(arr){const seen=new Set();return arr.filter(L=>{const k=L.name||JSON.stringify(L);if(seen.has(k))return false;seen.add(k);return true;});}
+  function applyDifficultyDefaults(arr){
+    arr.forEach(L=>{
+      if(!L.difficulty){
+        const formulaCount=L.expectFormulas?Object.keys(L.expectFormulas).length:(L.expectFormula?1:0);
+        const multi=(L.needChart?1:0)+(L.needSortedRange?1:0)+(L.expectFmtRange?1:0)+(L.expectFill?1:0)+(L.expectBoldRange?1:0)+(L.expectCol?1:0)+(L.expectRow?1:0);
+        L.difficulty=(formulaCount>=8 || multi>=3)?'hard':((formulaCount>=2 || multi>=2 || L.expectedChartType==='line' || L.name?.includes('Sam odaberi'))?'medium':'easy');
+      }
+    });
+    return arr;
+  }
+  function rebuildLevelsV20(){
+    const start=markLevels([...baseLevels.slice(0,9).map(normalizeStartLevel),...extraSkillLevels.slice(0,7).map(normalizeStartLevel)],'easy');
+    const charts=markLevels([...newChartLevels],'easy'); charts.forEach(L=>{if(L.name.includes('Linijski grafikon: rast')||L.name.includes('Sam odaberi'))L.difficulty='medium'});
+    const formulas=[...extraSkillLevels.slice(7).map(L=>cloneLevel(L,{mode:'Formule'})),...newFormulaLevels,...makeFormulaLevels().map(L=>cloneLevel(L,{mode:'Formule'}))];
+    const existingMixed=levels.filter(L=>L.mode==='Miješano');
+    const mixedAll=[...newMixedLevels,...existingMixed];
+    const combined=uniqueByName([...start,...charts,...formulas,...mixedAll]);
+    applyDifficultyDefaults(combined);
+    levels.splice(0,levels.length,...combined);
+    completed={}; currentLevel=Math.min(currentLevel,levels.length-1);
+  }
+  rebuildLevelsV20();
+
+  setupSelect=function(){
+    const s=document.getElementById('levelSelect'); if(!s)return;
+    s.innerHTML='';
+    levels.forEach((L,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`Nivo ${i+1}: ${levelDifficultyLabel(L.difficulty)} — ${L.name}`;s.appendChild(o);});
+  };
+  const oldRenderAllV20=renderAll;
+  renderAll=function(){
+    oldRenderAllV20();
+    const L=levels[currentLevel];
+    const badge=document.getElementById('chapterBadge');
+    if(badge){
+      badge.classList.remove('difficulty-easy','difficulty-medium','difficulty-hard');
+      badge.classList.add(diffClass(L.difficulty));
+      badge.innerHTML=`${L.chapter} <span class="difficulty-badge ${diffClass(L.difficulty)}">${levelDifficultyLabel(L.difficulty)}</span>`;
+    }
+    const mi=document.getElementById('modeIndicator'); if(mi)mi.textContent=L.mode;
+  };
+
+  const oldApplySetupV20=applySetup;
+  applySetup=function(L){resetChartV20(); return oldApplySetupV20(L);};
+
+  const oldCheckLevelV20=checkLevel;
+  checkLevel=function(){
+    const L=levels[currentLevel];let ok=true,msg='Bravo, tačno je.';
+    if(L.needTemplate){ok=chosenTemplate===L.needTemplate;msg=ok?'Tačno, otvorio/otvorila si pravi predložak.':'Nije taj predložak. Pogledaj naziv koji se traži u zadatku.';}
+    if(ok&&L.expectValue!==undefined){ok=almost(getCell(L.target),L.expectValue);msg=ok?'Tačno, ćelija ima traženi sadržaj.':`Provjeri ćeliju ${L.target}.`;}
+    if(ok&&L.expectFmt){ok=cells[L.target].fmt===L.expectFmt;msg=ok?'Tačno, format je dobro postavljen.':`Ćelija ${L.target} još nema traženi format.`;}
+    if(ok&&L.expectDec!==undefined){ok=cells[L.target].dec===L.expectDec;msg=ok?'Tačno, decimalna mjesta su dobro podešena.':'Podesi tačno 2 decimalna mjesta.';}
+    if(ok&&L.expectFormula){ok=normFormula(cells[L.target].formula)===normFormula(L.expectFormula);msg=ok?'Tačno, formula je unesena i rezultat je ispravan.':`Formula u ${L.target} nije dobra. Treba koristiti ${L.expectFormula}.`;}
+    if(ok&&L.expectFormulas){ok=checkAllFormulas(L.expectFormulas);msg=ok?'Tačno, sve tražene formule su unesene.':'Provjeri sve tražene formule u zadatku.';}
+    if(ok&&L.needSortedRange){ok=isRangeSorted(L.needSortedRange);msg=ok?msg:`Raspon ${L.needSortedRange} još nije sortiran ili nema dovoljno unesenih podataka.`;}
+    if(ok&&L.needChart){ok=chartInserted;msg=ok?msg:'Još treba ubaciti grafikon iz označenog raspona.';}
+    if(ok&&L.expectedChartType){ok=window.chartType===L.expectedChartType;msg=ok?msg:(L.chartHint || (L.expectedChartType==='line'?'Bolji je linijski grafikon jer prikazuje promjenu kroz redoslijed ili vrijeme.':L.expectedChartType==='pie'?'Bolji je tortni grafikon jer prikazuje udjele jedne cjeline.':'Bolji je stupčasti grafikon jer poredi kategorije.'));}
+    if(ok&&L.expectFill){ok=checkAllFill(L.expectFill.range,L.expectFill.color);msg=ok?msg:`Provjeri boju ćelija u rasponu ${L.expectFill.range}.`;}
+    if(ok&&L.expectBold){ok=!!cells[L.target].bold;msg=ok?msg:`Ćelija ${L.target} još nije boldirana.`;}
+    if(ok&&L.expectItalic){ok=!!cells[L.target].italic;msg=ok?msg:`Ćelija ${L.target} još nije italic.`;}
+    if(ok&&L.expectBoldCell){ok=!!cells[L.expectBoldCell].bold;msg=ok?msg:`Ćelija ${L.expectBoldCell} treba biti boldirana.`;}
+    if(ok&&L.expectBoldRange){ok=checkAllBold(L.expectBoldRange);msg=ok?msg:`Naslovni raspon ${L.expectBoldRange} treba biti boldiran.`;}
+    if(ok&&L.expectFmtRange){ok=checkAllFmt(L.expectFmtRange);msg=ok?msg:`Provjeri format u rasponu ${L.expectFmtRange.range}.`;}
+    if(ok&&L.expectCol){const w=colWidths[L.expectCol.c];ok=(L.expectCol.min===undefined||w>=L.expectCol.min)&&(L.expectCol.max===undefined||w<=L.expectCol.max);msg=ok?msg:'Provjeri širinu tražene kolone.';}
+    if(ok&&L.expectRow){const h=rowHeights[L.expectRow.r-1];ok=(L.expectRow.min===undefined||h>=L.expectRow.min)&&(L.expectRow.max===undefined||h<=L.expectRow.max);msg=ok?msg:'Provjeri visinu traženog reda.';}
+    if(ok&&L.needSelection&&!L.needChart){const req=rangeAddrs(L.needSelection).sort().join(',');ok=selection.slice().sort().join(',')===req;msg=ok?msg:'Označi tačan raspon ćelija naveden u zadatku.';}
+    if(ok){completed[currentLevel]=true;document.getElementById('nextBtn').disabled=false;flash(msg,'ok');showOverlay('Bravo!',msg+' Prelazim na sljedeći nivo.');setTimeout(()=>{closeOverlay();nextLevel()},850);}
+    else{flash(msg+' Ispravi zadatak ili klikni “Vrati nivo” ako želiš početi ponovo.','no');}
+  };
+
+  setupSelect(); resetLevel();
+})();
+
+/* ===== v21: težina samo bojom, bez tekstualnih oznaka ===== */
+(function(){
+  const css=document.createElement('style');
+  css.textContent=`
+    .level-select.diff-easy{background:#dcfce7!important;color:#166534!important;border:2px solid #22c55e!important;box-shadow:0 0 0 3px rgba(34,197,94,.18)!important;}
+    .level-select.diff-medium{background:#ffedd5!important;color:#9a3412!important;border:2px solid #f97316!important;box-shadow:0 0 0 3px rgba(249,115,22,.18)!important;}
+    .level-select.diff-hard{background:#fee2e2!important;color:#991b1b!important;border:2px solid #ef4444!important;box-shadow:0 0 0 3px rgba(239,68,68,.18)!important;}
+    .level-select option.diff-easy-option{background:#dcfce7!important;color:#166534!important;}
+    .level-select option.diff-medium-option{background:#ffedd5!important;color:#9a3412!important;}
+    .level-select option.diff-hard-option{background:#fee2e2!important;color:#991b1b!important;}
+    .chapter.diff-easy{background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;}
+    .chapter.diff-medium{background:#ffedd5!important;color:#9a3412!important;border-color:#fdba74!important;}
+    .chapter.diff-hard{background:#fee2e2!important;color:#991b1b!important;border-color:#fca5a5!important;}
+  `;
+  document.head.appendChild(css);
+
+  function dClass(d){return d==='hard'?'diff-hard':(d==='medium'?'diff-medium':'diff-easy');}
+  function optionClass(d){return d==='hard'?'diff-hard-option':(d==='medium'?'diff-medium-option':'diff-easy-option');}
+  function applySelectDifficulty(){
+    const s=document.getElementById('levelSelect');
+    const L=levels[currentLevel];
+    if(!s||!L)return;
+    s.classList.remove('diff-easy','diff-medium','diff-hard');
+    s.classList.add(dClass(L.difficulty));
+  }
+
+  setupSelect=function(){
+    const s=document.getElementById('levelSelect'); if(!s)return;
+    s.innerHTML='';
+    levels.forEach((L,i)=>{
+      const o=document.createElement('option');
+      o.value=i;
+      o.textContent=`Nivo ${i+1}: ${L.name}`;
+      o.className=optionClass(L.difficulty);
+      s.appendChild(o);
+    });
+    applySelectDifficulty();
+  };
+
+  const prevRenderAll=renderAll;
+  renderAll=function(){
+    prevRenderAll();
+    const L=levels[currentLevel];
+    const badge=document.getElementById('chapterBadge');
+    if(badge&&L){
+      badge.classList.remove('difficulty-easy','difficulty-medium','difficulty-hard','diff-easy','diff-medium','diff-hard');
+      badge.classList.add(dClass(L.difficulty));
+      badge.textContent=L.chapter;
+    }
+    applySelectDifficulty();
+  };
+
+  setupSelect();
+  renderAll();
+})();
+
+
+/* ===== v22: korekcije nivoa 27/28 i naziv kategorije Funkcije ===== */
+(function(){
+  function setH(headers){
+    if(typeof setHeaders==='function') setHeaders(headers);
+    else headers.forEach((h,i)=>setCell(addr(i,1),h,{bold:true,fill:'blue'}));
+  }
+  const formula27={
+    icon:'🧮',mode:'Formule',chapter:'Računske formule',name:'Kombinovana formula sa bonusom',difficulty:'medium',
+    concept:'Srednje težak zadatak kombinuje više ćelija i više računskih operacija u jednoj formuli.',
+    task:'U E2 izračunaj ukupan rezultat formulom =B2+C2+D2*2. Formula sabira test i projekat, a bonus množi sa 2.',
+    setup:()=>{setH(['Učenik','Test','Projekt','Bonus','Ukupno']);setCell('A2','Amina');setCell('B2',18);setCell('C2',22);setCell('D2',3);},
+    target:'E2',expectFormula:'=B2+C2+D2*2'
+  };
+  const formula28={
+    icon:'➗',mode:'Formule',chapter:'Računske formule',name:'Ukupan trošak podijeljen na učenike',difficulty:'medium',
+    concept:'Zagrade se koriste kada prvo treba sabrati više ćelija, pa tek onda rezultat podijeliti.',
+    task:'U F2 izračunaj cijenu po učeniku formulom =(B2+C2+D2)/E2. Prvo saberi tri troška, pa ih podijeli brojem učenika.',
+    setup:()=>{setH(['Izlet','Prevoz','Ulaznice','Hrana','Učenika','Po učeniku']);setCell('A2','Sarajevo');setCell('B2',120);setCell('C2',90);setCell('D2',150);setCell('E2',30);},
+    target:'F2',expectFormula:'=(B2+C2+D2)/E2'
+  };
+
+  // 27. i 28. nivo: srednja težina i stvarno kombinovanje više ćelija.
+  if(levels[26]) levels[26]=formula27;
+  if(levels[27]) levels[27]=formula28;
+
+  // Izbaci trenutne nivoe 60 i 61 jer su ponavljanje nivoa 59.
+  if(levels.length>=61) levels.splice(59,2);
+
+  // Od 31. nivoa pa do miješanih zadataka treba pisati Funkcije, ne Formule.
+  for(let i=30;i<levels.length;i++){
+    const L=levels[i];
+    if(!L || L.mode==='Miješano') break;
+    L.mode='Funkcije';
+    if(String(L.chapter||'').includes('Računske formule')) L.chapter='Funkcije';
+    if(String(L.chapter||'').startsWith('Funkcija ')) L.chapter=String(L.chapter).replace('Funkcija ','Funkcije ');
+  }
+
+  completed={};
+  currentLevel=Math.min(currentLevel,levels.length-1);
+  if(typeof setupSelect==='function') setupSelect();
+  if(typeof resetLevel==='function') resetLevel();
+})();
+
+</script>
+</body>
+</html>
