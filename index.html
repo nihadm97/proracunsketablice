@@ -2540,6 +2540,155 @@ document.addEventListener('mousedown', function(ev){
   try{renderSheet();}catch(e){}
 })();
 
+
+/* ===== v29: korekcije nivoa 6/7, redoslijed 10/11 i fizika nivo 86 ===== */
+(function(){
+  function putHeaders(headers){
+    if(typeof setHeaders==='function') setHeaders(headers);
+    else headers.forEach((h,i)=>setCell(addr(i,1),h,{bold:true,fill:'blue'}));
+  }
+  function removeByName(name){
+    const i=levels.findIndex(L=>L&&L.name===name);
+    return i>=0?levels.splice(i,1)[0]:null;
+  }
+  function addIfMissingAt(index,level){
+    if(levels.some(L=>L&&L.name===level.name)) return;
+    levels.splice(Math.max(0,Math.min(index,levels.length)),0,level);
+  }
+  function filledText(a){return String(getCell(a)??'').trim().length>0 && Number.isNaN(Number(String(getCell(a)).replace(',','.')));}
+  function filledNumber(a){const v=String(getCell(a)??'').trim().replace(',','.');return v!=='' && !Number.isNaN(Number(v));}
+  function checkTextCells(list){return (list||[]).every(filledText);}
+  function checkNumberCells(list){return (list||[]).every(filledNumber);}
+  function checkFillRanges(list){return (list||[]).every(x=>checkAllFill(x.range,x.color));}
+  function checkFmtRanges(list){return (list||[]).every(x=>checkAllFmt(x));}
+  function checkItalicRanges(list){return (list||[]).every(r=>rangeAddrs(r).every(a=>!!cells[a]?.italic));}
+  function checkTextValues(map){return Object.entries(map||{}).every(([a,v])=>String(getCell(a)).trim()===String(v));}
+
+  const openTextNumbers={
+    icon:'✍️',mode:'Uređivanje',chapter:'Upis u ćelije',name:'Otvoreni unos: tekst i brojevi',difficulty:'easy',
+    concept:'U tabelu možemo unositi svoje podatke. Tekst se najčešće koristi za nazive, a brojevi za računanje i poređenje.',
+    task:'U A2 i A3 upiši dva naziva po izboru, a u B2 i B3 dva broja po izboru.',
+    setup:()=>{putHeaders(['Naziv','Broj']);colWidths[0]=145;colWidths[1]=120;},
+    customValidation:true,expectTextCells:['A2','A3'],expectNumberCells:['B2','B3'],targets:['A2','A3','B2','B3']
+  };
+  const openMiniTable={
+    icon:'📝',mode:'Uređivanje',chapter:'Upis u ćelije',name:'Otvoreni unos: mini tabela',difficulty:'easy',
+    concept:'Kada samostalno unosiš podatke, važno je da kolone imaju jasan smisao: jedna kolona može biti tekstualna, a druga brojčana.',
+    task:'U A2:A4 upiši tri tekstualna podatka po izboru, a u B2:B4 tri broja po izboru.',
+    setup:()=>{putHeaders(['Podatak','Vrijednost']);colWidths[0]=150;colWidths[1]=130;},
+    customValidation:true,expectTextCells:['A2','A3','A4'],expectNumberCells:['B2','B3','B4'],targets:['A2','A3','A4','B2','B3','B4']
+  };
+
+  // Novi otvoreni zadaci idu na mjesto nivoa 6 i 7, prije ranijih zadataka za format broja i valute.
+  addIfMissingAt(5,openTextNumbers);
+  addIfMissingAt(6,openMiniTable);
+
+  // Raniji nivoi 10 i 11 (širina kolone i visina reda) idu na kraj uređivanja, neposredno prije grafikona.
+  const widthLevel=removeByName('Proširi kolonu za duži naziv');
+  const heightLevel=removeByName('Povećaj visinu reda');
+  const firstChart=levels.findIndex(L=>L&&L.mode==='Grafikoni');
+  const insertPos=firstChart>=0?firstChart:levels.length;
+  const moved=[widthLevel,heightLevel].filter(Boolean);
+  if(moved.length) levels.splice(insertPos,0,...moved);
+
+  const physics=levels.find(L=>L&&L.name==='Fizika 8. razred: brzina, put i vrijeme');
+  if(physics){
+    Object.assign(physics,{
+      icon:'🧪',mode:'Miješano',chapter:'Veliki završni zadaci',difficulty:'hard',
+      concept:'U fizici se brzina računa kao odnos puta i vremena. U proračunskoj tablici isti postupak ponavljamo pomoću formula i formatiranja.',
+      task:'U označene ćelije izračunaj brzinu, dupli put i razliku između duplog i početnog puta. Za izračunavanje brzine koristi odnos put / vrijeme, za dupli put koristi množenje početnog puta brojem 2, a razliku izračunaj oduzimanjem početnog puta od duplog puta. Brzinu prikaži na dvije decimale i oboji je plavom bojom. Vrijednosti za dupli put oboji crvenom bojom i prikaži ukoseno. Na kraju izračunaj ukupni put, prosječnu brzinu i najveću brzinu.',
+      setup:()=>{putHeaders(['Primjer','Put s (m)','Vrijeme t (s)','Brzina v','Dupli put','Razlika']);[
+        ['Trčanje',100,20],['Bicikl',240,30],['Autić',60,5],['Lopta',45,3],['Robot',36,6]
+      ].forEach((r,i)=>r.forEach((v,j)=>setCell(addr(j,i+2),v)));setCell('A7','Ukupni put');setCell('C7','Prosjek brzine');setCell('C8','Najveća brzina');colWidths[0]=135;colWidths[1]=125;colWidths[2]=130;colWidths[3]=125;colWidths[4]=125;colWidths[5]=125;},
+      customValidation:true,
+      expectTextValues:{A7:'Ukupni put'},
+      expectFormulas:{
+        D2:'=B2/C2',D3:'=B3/C3',D4:'=B4/C4',D5:'=B5/C5',D6:'=B6/C6',
+        E2:'=B2*2',E3:'=B3*2',E4:'=B4*2',E5:'=B5*2',E6:'=B6*2',
+        F2:'=E2-B2',F3:'=E3-B3',F4:'=E4-B4',F5:'=E5-B5',F6:'=E6-B6',
+        B7:'=SUM(B2:B6)',D7:'=AVERAGE(D2:D6)',D8:'=MAX(D2:D6)'
+      },
+      expectFmtRanges:[{range:'D2:D8',fmt:'number',dec:2},{range:'B2:B7',fmt:'number'},{range:'E2:F6',fmt:'number'}],
+      expectFillRanges:[{range:'D2:D8',color:'blue'},{range:'E2:E6',color:'red'}],
+      expectItalicRanges:['E2:E6'],
+      targets:['A7','B7','D2','D3','D4','D5','D6','D7','D8','E2','E3','E4','E5','E6','F2','F3','F4','F5','F6']
+    });
+    delete physics.expectFmtRange; delete physics.expectFill; delete physics.expectItalic; delete physics.target;
+  }
+
+  const oldTargetV29=targetAddrsForLevel;
+  targetAddrsForLevel=function(L=levels[currentLevel]){
+    const out=new Set(oldTargetV29?oldTargetV29(L):[]);
+    (L?.targets||[]).forEach(a=>out.add(a));
+    (L?.expectTextCells||[]).forEach(a=>out.add(a));
+    (L?.expectNumberCells||[]).forEach(a=>out.add(a));
+    Object.keys(L?.expectTextValues||{}).forEach(a=>out.add(a));
+    (L?.expectFmtRanges||[]).forEach(x=>rangeAddrs(x.range).forEach(a=>out.add(a)));
+    (L?.expectFillRanges||[]).forEach(x=>rangeAddrs(x.range).forEach(a=>out.add(a)));
+    (L?.expectItalicRanges||[]).forEach(r=>rangeAddrs(r).forEach(a=>out.add(a)));
+    (L?.excludeTargets||[]).forEach(a=>out.delete(a));
+    return [...out];
+  };
+
+  const oldCheckV29=checkLevel;
+  checkLevel=function(){
+    const L=levels[currentLevel];
+    if(!L || !L.customValidation) return oldCheckV29();
+    let ok=true,msg='Bravo, tačno je.';
+    if(ok&&L.expectTextCells){ok=checkTextCells(L.expectTextCells);msg=ok?msg:'Provjeri tekstualne ćelije. U njih treba upisati tekst, a ne samo broj.';}
+    if(ok&&L.expectNumberCells){ok=checkNumberCells(L.expectNumberCells);msg=ok?msg:'Provjeri brojčane ćelije. U njih treba upisati brojeve.';}
+    if(ok&&L.expectTextValues){ok=checkTextValues(L.expectTextValues);msg=ok?msg:'Provjeri traženi tekst u označenim ćelijama.';}
+    if(ok&&L.expectFormulas){ok=checkAllFormulas(L.expectFormulas);msg=ok?msg:'Provjeri sve tražene formule u zadatku.';}
+    if(ok&&L.expectFmtRanges){ok=checkFmtRanges(L.expectFmtRanges);msg=ok?msg:'Provjeri format brojeva i decimalna mjesta u označenim rasponima.';}
+    if(ok&&L.expectFillRanges){ok=checkFillRanges(L.expectFillRanges);msg=ok?msg:'Provjeri boje označenih ćelija.';}
+    if(ok&&L.expectItalicRanges){ok=checkItalicRanges(L.expectItalicRanges);msg=ok?msg:'Vrijednosti za dupli put trebaju biti ukosene.';}
+    if(ok){completed[currentLevel]=true;document.getElementById('nextBtn').disabled=false;flash(msg,'ok');showOverlay('Bravo!',msg+' Prelazim na sljedeći nivo.');setTimeout(()=>{closeOverlay();nextLevel()},850);}
+    else{flash(msg+' Ispravi zadatak ili klikni “Vrati nivo” ako želiš početi ponovo.','no');}
+  };
+
+  completed={};
+  currentLevel=Math.min(currentLevel,levels.length-1);
+  if(typeof setupSelect==='function')setupSelect();
+  if(typeof resetLevel==='function')resetLevel();
+})();
+
+
+/* ===== v30: pomjeranje zadatka za smanjenje širine kolone na kraj uređivanja ===== */
+(function(){
+  function removeByNameV30(name){
+    const i=levels.findIndex(L=>L&&L.name===name);
+    return i>=0?levels.splice(i,1)[0]:null;
+  }
+  const shrinkLevel=removeByNameV30('Smanji preširoku kolonu');
+  if(shrinkLevel){
+    shrinkLevel.mode='Uređivanje';
+    shrinkLevel.chapter='Uređivanje i formatiranje ćelije';
+    shrinkLevel.difficulty=shrinkLevel.difficulty||'easy';
+    const firstChart=levels.findIndex(L=>L&&L.mode==='Grafikoni');
+    const insertPos=firstChart>=0?firstChart:levels.length;
+    levels.splice(insertPos,0,shrinkLevel);
+    completed={};
+    currentLevel=Math.min(currentLevel,levels.length-1);
+    if(typeof setupSelect==='function')setupSelect();
+    if(typeof resetLevel==='function')resetLevel();
+  }
+})();
+
+
+/* ===== v31: trenutni nivo 12 pomjeren na nivo 19 ===== */
+(function(){
+  const fromIndex=11; // nivo 12
+  const toIndex=18;   // nivo 19 nakon pomjeranja
+  if(Array.isArray(levels) && levels.length>toIndex){
+    const movedLevel=levels.splice(fromIndex,1)[0];
+    levels.splice(toIndex,0,movedLevel);
+    completed={};
+    currentLevel=Math.min(currentLevel,levels.length-1);
+    if(typeof setupSelect==='function')setupSelect();
+    if(typeof resetLevel==='function')resetLevel();
+  }
+})();
+
 </script>
 </body>
 </html>
